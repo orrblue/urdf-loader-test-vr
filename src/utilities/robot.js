@@ -1,6 +1,10 @@
 import * as T from "three";
-import { EE_TO_GRIPPER_OFFSET, EE_TO_THREE_ROT_OFFSET } from "./globals";
-import { relToAbs } from "./math";
+import {
+  EE_TO_GRIPPER_OFFSET,
+  EE_TO_THREE_ROT_OFFSET,
+  T_ROS_to_THREE,
+} from "./globals";
+import { relToAbs, changeReferenceFrame } from "./math";
 
 export function recurseMaterialTraverse(material, func) {
   if (material.length > 1) {

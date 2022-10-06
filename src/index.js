@@ -325,7 +325,7 @@ async function someInit() {
       // only update and log data if user is in VR
       const t = Date.now();
       control.update(t);
-      control.log(t);
+      //control.log(t);
     }
 
     setTimeout(update, 5);

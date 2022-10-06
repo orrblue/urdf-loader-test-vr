@@ -59,14 +59,14 @@ export default class Control {
     window.targetCursor = targetCursor;
     updateTargetCursor();
 
-    control.controller = new Controllers(control.renderer, control.teleportvr);
-
     // whether or not teleportation is enabled,
     // teleportvr is still initialized here because it is used to set the initial position of the user
     control.teleportvr = new TeleportVR(window.scene, control.camera);
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
     );
+
+    control.controller = new Controllers(control.renderer, control.teleportvr);
 
     const utilities = {
       data: control.data,
