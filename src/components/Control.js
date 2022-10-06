@@ -205,9 +205,12 @@ export default class Control {
     });
 
     // use the trigger on the left controller to reset the current trial
-    control.controller.get("left").controller.addEventListener("select", () => {
-      control.tasks[Number(control.fsm.state)].fsm.reset();
-    });
+    control.controller.controller[0].controller.addEventListener(
+      "select",
+      () => {
+        control.tasks[Number(control.fsm.state)].fsm.reset();
+      }
+    );
 
     return control;
   }

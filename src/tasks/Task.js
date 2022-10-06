@@ -2,7 +2,7 @@ import * as T from "three";
 import { v4 as id } from "uuid";
 import StateMachine from "javascript-state-machine";
 import { resetRobot } from "../utilities/robot";
-import { sounds } from "../utilities/sounds";
+import { TASK_COMPLETE } from "../utilities/sounds";
 
 const NUM_ROUNDS = 1;
 
@@ -103,7 +103,7 @@ export default class Task {
 
             resetRobot();
             that.condition.unload();
-            sounds["task-complete"].play();
+            TASK_COMPLETE.play();
             that.onComplete();
           } else {
             if (that.resetAfterTrial) {
