@@ -90,7 +90,7 @@ export default class PickAndDrop extends Task {
 
     for (const block of blocks) block.update(this.world, gripper);
 
-    // table.update(this.world, this.controller);
+    table.update(this.world, this.controller);
 
     // ~ go to the next trial if the box or any block hits the ground ~
 

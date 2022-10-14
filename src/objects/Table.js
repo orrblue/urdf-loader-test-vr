@@ -3,7 +3,10 @@ import { loadGLTF } from "../utilities/loaders";
 import RAPIER from "@dimforge/rapier3d";
 import Controllers from "../components/Controllers";
 import SceneObject from "./SceneObject";
+import { getCurrEEPose, setPos } from "../utilities/robot";
 import { v4 as id } from "uuid";
+import { T_ROS_to_THREE } from "../utilities/globals";
+import { changeReferenceFrame } from "../utilities/math";
 
 const PATH = "./models/table.glb";
 
@@ -151,6 +154,11 @@ export default class Table extends SceneObject {
    * @param {Controllers} controller
    */
   update(world, controller) {
+    let pos = changeReferenceFrame(window.goalEERelThree, T_ROS_to_THREE);
+    if (pos.posi.z < 0.35) {
+      pos.posi.z = 0.35;
+      setPos(pos);
+    }
     let tableContact = false;
     for (const colliderName in window.robotColliders) {
       const colliders = window.robotColliders[colliderName];

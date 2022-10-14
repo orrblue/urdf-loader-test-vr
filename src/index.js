@@ -135,7 +135,7 @@ function loadRobot(name, file, info, nn, loadScreen = false) {
                 const visualGroup = new T.Group();
                 visualGroup.add(urdfVisual);
                 scene.add(visualGroup);
-                simObjs.set(rigidBody, visualGroup);
+                window.simObjs.set(rigidBody, visualGroup);
               }
 
               if (

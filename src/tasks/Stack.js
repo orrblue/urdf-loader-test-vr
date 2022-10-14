@@ -84,7 +84,7 @@ export default class Stack extends Task {
 
     for (const block of blocks) block.update(this.world, gripper);
 
-    // table.update(this.world, this.controller);
+    table.update(this.world, this.controller);
 
     // ~ go to the next trial if any block hits the ground ~
 
