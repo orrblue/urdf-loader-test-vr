@@ -19,6 +19,7 @@ import RemoteControlTutorial from "../tasks/tutorials/RemoteControlTutorial";
 import GraspingTutorial from "../tasks/tutorials/GraspingTutorial";
 import PickAndDrop from "../tasks/PickAndDrop";
 import Stack from "../tasks/Stack";
+import Drawing from "../tasks/Drawing";
 import End from "../tasks/End";
 
 // modules
@@ -84,6 +85,17 @@ export default class Control {
         new Condition("drag-control-only", [
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
+      ),
+      await Drawing.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          robotControlled: false,
+          numRounds: 2,
+          text: "Use drag control to draw on the whiteboard. To complete the task, follow the outline.\n\n",
+        }
       ),
       await GraspingTutorial.init(
         utilities,

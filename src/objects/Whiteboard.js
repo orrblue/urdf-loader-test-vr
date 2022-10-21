@@ -1,0 +1,107 @@
+import * as T from "three";
+import { loadGLTF } from "../utilities/loaders";
+import RAPIER from "@dimforge/rapier3d";
+import Controllers from "../components/Controllers";
+import SceneObject from "./SceneObject";
+import { setPos } from "../utilities/robot";
+import { T_ROS_to_THREE } from "../utilities/globals";
+import { changeReferenceFrame } from "../utilities/math";
+
+const PATH = "./models/whiteboard/scene.gltf";
+
+export default class Whiteboard extends SceneObject {
+  constructor(params, options = {}) {
+    super("whiteboard", params);
+    this.initPosition = options.position ?? new T.Vector3();
+    this.initRotation = options.rotation ?? new T.Euler();
+    this.initScale = options.scale ?? new T.Vector3(0.125, 0.125, 0.125);
+    this.loaded = false;
+  }
+
+  static async init(params) {
+    const object = new Whiteboard(params);
+    await object.fetch();
+    return object;
+  }
+
+  async fetch() {
+    const gltf = await loadGLTF(PATH);
+    const mesh = gltf.scene;
+
+    // position and rotation will be overridden by the physics engine
+    // these values are set here to prevent teleporting on load
+    mesh.position.copy(this.initPosition);
+    mesh.rotation.copy(this.initRotation);
+    mesh.scale.copy(this.initScale);
+    mesh.traverse((child) => {
+      (child.castShadow = true), (child.receiveShadow = true);
+    });
+
+    this.meshes = [mesh];
+  }
+
+  load() {
+    // build rigid-body
+    const rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+      .setTranslation(
+        this.initPosition.x,
+        this.initPosition.y,
+        this.initPosition.z
+      )
+      .setRotation(new T.Quaternion().setFromEuler(this.initRotation))
+      .lockTranslations()
+      .lockRotations();
+    const rigidBody = this.world.createRigidBody(rigidBodyDesc);
+
+    // build colliders
+    const colliderDescs = [];
+
+    const colliders = [];
+    for (const colliderDesc of colliderDescs) {
+      const collider = this.world.createCollider(colliderDesc, rigidBody);
+      collider.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
+      colliders.push(collider);
+    }
+
+    window.simObjs.set(rigidBody, this.meshes[0]);
+    window.scene.add(this.meshes[0]);
+
+    this.rigidBody = rigidBody;
+    this.colliders = colliders;
+
+    this.loaded = true;
+  }
+
+  destruct() {
+    window.scene.remove(this.meshes[0]);
+    window.simObjs.delete(this.rigidBody);
+    this.world.removeRigidBody(this.rigidBody);
+
+    this.loaded = false;
+  }
+
+  /**
+   * Detects collision between robot and table and provides haptic feedback.
+   * @param {*} world
+   * @param {Controllers} controller
+   */
+  update(world, controller) {
+    let pos = changeReferenceFrame(window.goalEERelThree, T_ROS_to_THREE);
+    if (pos.posi.z < 0.35) {
+      pos.posi.z = 0.35;
+      setPos(pos);
+    }
+    let tableContact = false;
+    for (const colliderName in window.robotColliders) {
+      const colliders = window.robotColliders[colliderName];
+      for (const collider of colliders) {
+        world.contactsWith(collider, (collider2) => {
+          if (this.colliders.includes(collider2) && !tableContact) {
+            controller.get().gamepad?.hapticActuators[0].pulse(1, 18);
+            tableContact = true;
+          }
+        });
+      }
+    }
+  }
+}

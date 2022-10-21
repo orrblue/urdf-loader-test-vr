@@ -3,7 +3,7 @@ import { loadGLTF } from "../utilities/loaders";
 import RAPIER from "@dimforge/rapier3d";
 import Controllers from "../components/Controllers";
 import SceneObject from "./SceneObject";
-import { getCurrEEPose, setPos } from "../utilities/robot";
+import { setPos } from "../utilities/robot";
 import { v4 as id } from "uuid";
 import { T_ROS_to_THREE } from "../utilities/globals";
 import { changeReferenceFrame } from "../utilities/math";
