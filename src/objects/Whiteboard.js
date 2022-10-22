@@ -54,7 +54,13 @@ export default class Whiteboard extends SceneObject {
     const rigidBody = this.world.createRigidBody(rigidBodyDesc);
 
     // build colliders
-    const colliderDescs = [];
+    const colliderDescs = [
+      RAPIER.ColliderDesc.cuboid(
+        0.125 * this.initScale.x,
+        3.85 * this.initScale.y,
+        5.5 * this.initScale.z
+      ).setTranslation(0, 11.225 * this.initScale.y, 0),
+    ];
 
     const colliders = [];
     for (const colliderDesc of colliderDescs) {
@@ -81,27 +87,15 @@ export default class Whiteboard extends SceneObject {
   }
 
   /**
-   * Detects collision between robot and table and provides haptic feedback.
+   * Fakes collision between robot with pen and whiteboard
    * @param {*} world
    * @param {Controllers} controller
    */
   update(world, controller) {
     let pos = changeReferenceFrame(window.goalEERelThree, T_ROS_to_THREE);
-    if (pos.posi.z < 0.35) {
-      pos.posi.z = 0.35;
+    if (pos.posi.x > -0.5) {
+      pos.posi.x = -0.5;
       setPos(pos);
-    }
-    let tableContact = false;
-    for (const colliderName in window.robotColliders) {
-      const colliders = window.robotColliders[colliderName];
-      for (const collider of colliders) {
-        world.contactsWith(collider, (collider2) => {
-          if (this.colliders.includes(collider2) && !tableContact) {
-            controller.get().gamepad?.hapticActuators[0].pulse(1, 18);
-            tableContact = true;
-          }
-        });
-      }
     }
   }
 }

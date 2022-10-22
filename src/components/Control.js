@@ -92,7 +92,7 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
-          robotControlled: false,
+          robotControlled: true,
           numRounds: 2,
           text: "Use drag control to draw on the whiteboard. To complete the task, follow the outline.\n\n",
         }

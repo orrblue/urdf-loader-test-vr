@@ -48,7 +48,12 @@ export default class Marker extends SceneObject {
     const rigidBody = this.world.createRigidBody(rigidBodyDesc);
 
     // build colliders
-    const colliderDescs = [];
+    const colliderDescs = [
+      RAPIER.ColliderDesc.cylinder(
+        3.85 * this.initScale.y,
+        0.25 * this.initScale.x
+      ).setTranslation(0, -2.65 * this.initScale.y, 0),
+    ];
 
     const colliders = [];
     for (const colliderDesc of colliderDescs) {
