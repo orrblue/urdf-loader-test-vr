@@ -3,7 +3,7 @@ import { loadGLTF } from "../utilities/loaders";
 import RAPIER from "@dimforge/rapier3d";
 import SceneObject from "./SceneObject";
 
-const PATH = "./models/marker/scene.gltf";
+const PATH = "./models/marker.glb";
 
 export default class Marker extends SceneObject {
   constructor(params, options = {}) {
@@ -52,7 +52,7 @@ export default class Marker extends SceneObject {
       RAPIER.ColliderDesc.cylinder(
         3.85 * this.initScale.y,
         0.25 * this.initScale.x
-      ).setTranslation(0, -2.65 * this.initScale.y, 0),
+      ).setTranslation(0, -1 * this.initScale.y, 0),
     ];
 
     const colliders = [];

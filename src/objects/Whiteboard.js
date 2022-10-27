@@ -7,7 +7,7 @@ import { setPos } from "../utilities/robot";
 import { T_ROS_to_THREE } from "../utilities/globals";
 import { changeReferenceFrame } from "../utilities/math";
 
-const PATH = "./models/whiteboard/scene.gltf";
+const PATH = "./models/whiteboard.glb";
 
 export default class Whiteboard extends SceneObject {
   constructor(params, options = {}) {
@@ -57,9 +57,9 @@ export default class Whiteboard extends SceneObject {
     const colliderDescs = [
       RAPIER.ColliderDesc.cuboid(
         0.125 * this.initScale.x,
-        3.85 * this.initScale.y,
+        3.9 * this.initScale.y,
         5.5 * this.initScale.z
-      ).setTranslation(0, 11.225 * this.initScale.y, 0),
+      ).setTranslation(0, 10.75 * this.initScale.y, 0),
     ];
 
     const colliders = [];

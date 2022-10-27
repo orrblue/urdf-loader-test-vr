@@ -12,6 +12,13 @@ export default class Drawing extends Task {
       marker: await Marker.init(params),
     };
     task.robotControlled = options.robotControlled ?? true;
+    task.points = [];
+    task.material = new T.LineBasicMaterial({
+      color: options.color ?? "blue",
+      linewidth: 5,
+    });
+    task.line = null;
+    task.lineAdded = false;
     return task;
   }
 
@@ -58,8 +65,9 @@ export default class Drawing extends Task {
 
   onUpdate(t, info) {
     const whiteboard = this.objects.whiteboard;
-    whiteboard.update(this.world, this.controller);
+    //whiteboard.update(this.world, this.controller);
     this.updateMarker();
+    this.draw();
 
     // ~ update ui elements ~
 
@@ -85,7 +93,35 @@ export default class Drawing extends Task {
     });
     if (this.robotControlled) {
       this.objects.marker.meshes[0].rotateX(-Math.PI / 2);
+      this.objects.marker.meshes[0].translateY(-0.2);
+    } else {
       this.objects.marker.meshes[0].translateY(-0.1);
+    }
+  }
+
+  draw() {
+    const state = this.objects.marker.getState()[0];
+    let position = state.position;
+    const rotation = state.rotation;
+    if (
+      position.x > 0.85 &&
+      position.y > 0.85 &&
+      position.y < 1.85 &&
+      position.z > -0.7 &&
+      position.z < 0.7
+    ) {
+      position.x = 0.99;
+      this.points.push(position);
+    }
+    if (this.points.length > 2) {
+      if (this.lineAdded) {
+        window.scene.remove(this.line);
+        this.lineAdded = false;
+      }
+      const geometry = new T.BufferGeometry().setFromPoints(this.points);
+      this.line = new T.Line(geometry, this.material);
+      window.scene.add(this.line);
+      this.lineAdded = true;
     }
   }
 }
