@@ -86,23 +86,24 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
-      await Drawing.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          robotControlled: false,
-          numRounds: 2,
-          text: "Use drag control to draw on the whiteboard. To complete the task, follow the outline.\n\n",
-        }
-      ),
       await GraspingTutorial.init(
         utilities,
         new Condition("drag-control-only", [
           new DragControl(utilities, { controlMode: "grip-toggle" }),
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
+      ),
+      await Drawing.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          robotControlled: false,
+          distFromWhiteboard: 0.05,
+          numRounds: 2,
+          text: "Use drag control to draw on the whiteboard. To complete the task, follow the outline.\n\n",
+        }
       ),
       await PickAndDrop.init(
         utilities,

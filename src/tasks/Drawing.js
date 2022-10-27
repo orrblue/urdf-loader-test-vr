@@ -12,12 +12,15 @@ export default class Drawing extends Task {
       marker: await Marker.init(params),
     };
     task.robotControlled = options.robotControlled ?? true;
+    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.1;
+    task.vibrateOnDraw = options.vibrateOnDraw ?? true;
     task.points = [];
     task.material = new T.LineBasicMaterial({
       color: options.color ?? "blue",
       linewidth: 5,
     });
-    task.line = null;
+    task.lines = [null];
+    task.lineIndex = 0;
     task.lineAdded = false;
     return task;
   }
@@ -104,7 +107,7 @@ export default class Drawing extends Task {
     let position = state.position;
     const rotation = state.rotation;
     if (
-      position.x > 0.85 &&
+      position.x > 1 - this.distFromWhiteboard &&
       position.y > 0.85 &&
       position.y < 1.85 &&
       position.z > -0.7 &&
@@ -112,15 +115,24 @@ export default class Drawing extends Task {
     ) {
       position.x = 0.99;
       this.points.push(position);
-    }
-    if (this.points.length > 2) {
+      if (this.vibrateOnDraw) {
+        this.controller.get().gamepad?.hapticActuators[0].pulse(1, 18);
+      }
       if (this.lineAdded) {
-        window.scene.remove(this.line);
+        window.scene.remove(this.lines[this.lineIndex]);
         this.lineAdded = false;
       }
+    } else {
+      this.points = [];
+      if (this.lines[this.lineIndex] != null) {
+        this.lines.push(null);
+        this.lineIndex++;
+      }
+    }
+    if (this.points.length > 2) {
       const geometry = new T.BufferGeometry().setFromPoints(this.points);
-      this.line = new T.Line(geometry, this.material);
-      window.scene.add(this.line);
+      this.lines[this.lineIndex] = new T.Line(geometry, this.material);
+      window.scene.add(this.lines[this.lineIndex]);
       this.lineAdded = true;
     }
   }
