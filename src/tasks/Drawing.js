@@ -12,8 +12,10 @@ export default class Drawing extends Task {
       marker: await Marker.init(params),
     };
     task.robotControlled = options.robotControlled ?? true;
-    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.1;
-    task.vibrateOnDraw = options.vibrateOnDraw ?? true;
+    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
+    task.vibrateOnDraw = options.vibrateOnDraw ?? false;
+    task.rotationBased = options.rotationBased ?? false;
+    task.displayPointer = options.displayPointer ?? false;
     task.points = [];
     task.material = new T.LineBasicMaterial({
       color: options.color ?? "blue",
@@ -22,6 +24,7 @@ export default class Drawing extends Task {
     task.lines = [null];
     task.lineIndex = 0;
     task.lineAdded = false;
+    task.pointer = null;
     return task;
   }
 
@@ -60,10 +63,23 @@ export default class Drawing extends Task {
         if (child instanceof T.Mesh) child.visible = false;
       });
     }
+
+    if (this.displayPointer) {
+      const geom = new T.SphereGeometry(0.01);
+      const mat = new T.MeshBasicMaterial({ color: "red" });
+      this.pointer = new T.Mesh(geom, mat);
+      window.scene.add(this.pointer);
+    }
   }
 
   onStop() {
     this.instructions.hide();
+    for (let line of this.lines) {
+      window.scene.remove(line);
+    }
+    this.controller.get().grip.traverse((child) => {
+      if (child instanceof T.Mesh) child.visible = true;
+    });
   }
 
   onUpdate(t, info) {
@@ -106,17 +122,31 @@ export default class Drawing extends Task {
     const state = this.objects.marker.getState()[0];
     let position = state.position;
     const rotation = state.rotation;
+    let target = null;
+    let dist = 0;
+    if (this.rotationBased) {
+      target = this.calculatePointer(position, rotation);
+      dist = target.distanceTo(
+        new T.Vector3(position.x, position.y, position.z)
+      );
+    } else {
+      target = new T.Vector3(0.99, position.y, position.z);
+      dist = 0.99 - position.x;
+    }
     if (
-      position.x > 1 - this.distFromWhiteboard &&
-      position.y > 0.85 &&
-      position.y < 1.85 &&
-      position.z > -0.7 &&
-      position.z < 0.7
+      dist < this.distFromWhiteboard &&
+      target != null &&
+      target.y > 0.85 &&
+      target.y < 1.85 &&
+      target.z > -0.7 &&
+      target.z < 0.7
     ) {
-      position.x = 0.99;
-      this.points.push(position);
+      this.points.push(target);
       if (this.vibrateOnDraw) {
-        this.controller.get().gamepad?.hapticActuators[0].pulse(1, 18);
+        this.controller.get().gamepad?.hapticActuators[0].pulse(0.1, 18);
+      }
+      if (this.displayPointer) {
+        this.pointer.position.copy(target);
       }
       if (this.lineAdded) {
         window.scene.remove(this.lines[this.lineIndex]);
@@ -135,5 +165,16 @@ export default class Drawing extends Task {
       window.scene.add(this.lines[this.lineIndex]);
       this.lineAdded = true;
     }
+  }
+
+  calculatePointer(position, rotation) {
+    let origin = new T.Vector3(position.x, position.y, position.z);
+    let direction = new T.Vector3(0, -1, 0);
+    direction.applyQuaternion(rotation);
+    const ray = new T.Ray(origin, direction);
+    const plane = new T.Plane(new T.Vector3(-1, 0, 0), 0.99);
+    let target = new T.Vector3();
+    ray.intersectPlane(plane, target);
+    return target;
   }
 }

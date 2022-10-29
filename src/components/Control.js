@@ -86,24 +86,39 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
+      await Drawing.init(utilities, new Condition("drag-control-only", []), {
+        robotControlled: false,
+        text: "Projection Perpendicular to Whiteboard.\n\n",
+      }),
+      await Drawing.init(utilities, new Condition("drag-control-only", []), {
+        robotControlled: false,
+        rotationBased: true,
+        text: "Projection Parallel to Marker.\n\n",
+      }),
+      await Drawing.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          text: "Drag Control.\n\n",
+        }
+      ),
+      await Drawing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          text: "Remote Control.\n\n",
+        }
+      ),
       await GraspingTutorial.init(
         utilities,
         new Condition("drag-control-only", [
           new DragControl(utilities, { controlMode: "grip-toggle" }),
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
-      ),
-      await Drawing.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          robotControlled: false,
-          distFromWhiteboard: 0.05,
-          numRounds: 2,
-          text: "Use drag control to draw on the whiteboard. To complete the task, follow the outline.\n\n",
-        }
       ),
       await PickAndDrop.init(
         utilities,
@@ -222,6 +237,13 @@ export default class Control {
       "select",
       () => {
         control.tasks[Number(control.fsm.state)].fsm.reset();
+      }
+    );
+    // use the gripper on the left controller to continue to the next trial
+    control.controller.controller[0].controller.addEventListener(
+      "squeeze",
+      () => {
+        control.tasks[Number(control.fsm.state)].fsm.next();
       }
     );
 
