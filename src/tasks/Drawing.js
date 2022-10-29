@@ -99,23 +99,36 @@ export default class Drawing extends Task {
 
   updateMarker() {
     let pose;
+    let posi = new T.Vector3();
+    let ori = new T.Quaternion();
     if (this.robotControlled) {
       pose = getCurrEEPose();
+      posi.copy(pose.posi);
+      ori.copy(pose.ori);
+      let correctionRot = new T.Quaternion(
+        Math.sin(-Math.PI / 4),
+        0,
+        0,
+        Math.cos(-Math.PI / 4)
+      );
+      ori.multiply(correctionRot);
+      let correctionTrans = new T.Vector3(0, -0.2, 0);
+      correctionTrans.applyQuaternion(ori);
+      posi.add(correctionTrans);
     } else {
       pose = this.controller.getPose("right");
+      posi.copy(pose.posi);
+      ori.copy(pose.ori);
+      let correctionTrans = new T.Vector3(0, -0.1, 0);
+      correctionTrans.applyQuaternion(ori);
+      posi.add(correctionTrans);
     }
-    let ori = new T.Euler();
-    ori.setFromQuaternion(pose.ori);
+    let rot = new T.Euler();
+    rot.setFromQuaternion(ori);
     this.objects.marker.set({
-      position: pose.posi,
-      rotation: ori,
+      position: posi,
+      rotation: rot,
     });
-    if (this.robotControlled) {
-      this.objects.marker.meshes[0].rotateX(-Math.PI / 2);
-      this.objects.marker.meshes[0].translateY(-0.2);
-    } else {
-      this.objects.marker.meshes[0].translateY(-0.1);
-    }
   }
 
   draw() {
