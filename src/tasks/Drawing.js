@@ -138,10 +138,9 @@ export default class Drawing extends Task {
     let target = null;
     let dist = 0;
     if (this.rotationBased) {
-      target = this.calculatePointer(position, rotation);
-      dist = target.distanceTo(
-        new T.Vector3(position.x, position.y, position.z)
-      );
+      const calculation = this.calculatePointer(position, rotation);
+      target = calculation.point;
+      dist = calculation.dist;
     } else {
       target = new T.Vector3(0.99, position.y, position.z);
       dist = 0.99 - position.x;
@@ -181,13 +180,11 @@ export default class Drawing extends Task {
   }
 
   calculatePointer(position, rotation) {
-    let origin = new T.Vector3(position.x, position.y, position.z);
     let direction = new T.Vector3(0, -1, 0);
     direction.applyQuaternion(rotation);
-    const ray = new T.Ray(origin, direction);
-    const plane = new T.Plane(new T.Vector3(-1, 0, 0), 0.99);
-    let target = new T.Vector3();
-    ray.intersectPlane(plane, target);
-    return target;
+    const dist = (0.99 - position.x) / direction.x;
+    direction.multiplyScalar(dist);
+    direction.add(position);
+    return { point: direction, dist: dist };
   }
 }
