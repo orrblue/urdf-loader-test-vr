@@ -13,13 +13,13 @@ export default class Drawing extends Task {
     };
     task.robotControlled = options.robotControlled ?? true;
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
-    task.vibrateOnDraw = options.vibrateOnDraw ?? false;
+    task.drawVibrationStrength = options.drawVibrationStrength ?? 0;
     task.rotationBased = options.rotationBased ?? false;
-    task.displayPointer = options.displayPointer ?? false;
+    task.pointerSize = options.pointerSize ?? 0;
     task.points = [];
     task.material = new T.LineBasicMaterial({
       color: options.color ?? "blue",
-      linewidth: 5,
+      linewidth: options.lineWidth ?? 5,
     });
     task.lines = [null];
     task.lineIndex = 0;
@@ -64,8 +64,8 @@ export default class Drawing extends Task {
       });
     }
 
-    if (this.displayPointer) {
-      const geom = new T.SphereGeometry(0.01);
+    if (this.pointerSize != 0) {
+      const geom = new T.SphereGeometry(this.pointerSize);
       const mat = new T.MeshBasicMaterial({ color: "red" });
       this.pointer = new T.Mesh(geom, mat);
       window.scene.add(this.pointer);
@@ -80,6 +80,9 @@ export default class Drawing extends Task {
     this.controller.get().grip.traverse((child) => {
       if (child instanceof T.Mesh) child.visible = true;
     });
+    if (this.pointerSize != 0) {
+      window.scene.remove(this.pointer);
+    }
   }
 
   onUpdate(t, info) {
@@ -137,6 +140,7 @@ export default class Drawing extends Task {
     const rotation = state.rotation;
     let target = null;
     let dist = 0;
+
     if (this.rotationBased) {
       const calculation = this.calculatePointer(position, rotation);
       target = calculation.point;
@@ -145,20 +149,23 @@ export default class Drawing extends Task {
       target = new T.Vector3(0.99, position.y, position.z);
       dist = 0.99 - position.x;
     }
-    if (
-      dist < this.distFromWhiteboard &&
-      target != null &&
-      target.y > 0.85 &&
-      target.y < 1.85 &&
-      target.z > -0.7 &&
-      target.z < 0.7
-    ) {
-      this.points.push(target);
-      if (this.vibrateOnDraw) {
-        this.controller.get().gamepad?.hapticActuators[0].pulse(0.1, 18);
-      }
-      if (this.displayPointer) {
+
+    const inBounds =
+      target.y > 0.85 && target.y < 1.85 && target.z > -0.7 && target.z < 0.7;
+    if (this.pointerSize != 0) {
+      if (inBounds && dist >= 0) {
         this.pointer.position.copy(target);
+      } else {
+        this.pointer.position.set(0, 0, 0);
+      }
+    }
+
+    if (dist < this.distFromWhiteboard && inBounds) {
+      this.points.push(target);
+      if (this.drawVibrationStrength != 0) {
+        this.controller
+          .get()
+          .gamepad?.hapticActuators[0].pulse(this.drawVibrationStrength, 18);
       }
       if (this.lineAdded) {
         window.scene.remove(this.lines[this.lineIndex]);
@@ -171,6 +178,7 @@ export default class Drawing extends Task {
         this.lineIndex++;
       }
     }
+
     if (this.points.length > 2) {
       const geometry = new T.BufferGeometry().setFromPoints(this.points);
       this.lines[this.lineIndex] = new T.Line(geometry, this.material);

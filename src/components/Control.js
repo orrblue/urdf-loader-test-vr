@@ -88,13 +88,27 @@ export default class Control {
       ),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
+        pointerSize: 0.001,
+        distFromWhiteboard: 0.025,
         text: "Projection Perpendicular to Whiteboard.\n\n",
       }),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
+        pointerSize: 0.001,
+        distFromWhiteboard: 0.025,
         rotationBased: true,
         text: "Projection Parallel to Marker.\n\n",
       }),
+      await Drawing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          rotationBased: true,
+          text: "Remote Control.\n\n",
+        }
+      ),
       await Drawing.init(
         utilities,
         new Condition("drag-control-only", [
@@ -102,15 +116,6 @@ export default class Control {
         ]),
         {
           text: "Drag Control.\n\n",
-        }
-      ),
-      await Drawing.init(
-        utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          text: "Remote Control.\n\n",
         }
       ),
       await GraspingTutorial.init(
@@ -232,16 +237,9 @@ export default class Control {
       control.fsm.start();
     });
 
-    // use the trigger on the left controller to reset the current trial
+    // use the trigger on the left controller to continue to the next trial
     control.controller.controller[0].controller.addEventListener(
       "select",
-      () => {
-        control.tasks[Number(control.fsm.state)].fsm.reset();
-      }
-    );
-    // use the gripper on the left controller to continue to the next trial
-    control.controller.controller[0].controller.addEventListener(
-      "squeeze",
       () => {
         control.tasks[Number(control.fsm.state)].fsm.next();
       }
