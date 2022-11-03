@@ -88,15 +88,17 @@ export default class Control {
       ),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
+        adjustedControl: false,
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
         text: "Projection Perpendicular to Whiteboard.\n\n",
       }),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
+        adjustedControl: true,
+        curvePath: "hri",
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
-        rotationBased: true,
         text: "Projection Parallel to Marker.\n\n",
       }),
       await Drawing.init(
@@ -106,16 +108,8 @@ export default class Control {
         ]),
         {
           rotationBased: true,
+          curvePath: "ros",
           text: "Remote Control.\n\n",
-        }
-      ),
-      await Drawing.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          text: "Drag Control.\n\n",
         }
       ),
       await GraspingTutorial.init(

@@ -12,15 +12,21 @@ export default class Drawing extends Task {
       marker: await Marker.init(params),
     };
     task.robotControlled = options.robotControlled ?? true;
+    task.adjustedControl = options.adjustedControl ?? false;
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.drawVibrationStrength = options.drawVibrationStrength ?? 0;
-    task.rotationBased = options.rotationBased ?? false;
+    task.rotationBased = options.rotationBased ?? true;
     task.pointerSize = options.pointerSize ?? 0;
     task.points = [];
     task.material = new T.LineBasicMaterial({
       color: options.color ?? "blue",
       linewidth: options.lineWidth ?? 5,
     });
+    task.curvePath = options.curvePath
+      ? `assets/${options.curvePath}_curve.jpg`
+      : "assets/lab_curve.jpg";
+    task.curveScale = options.curveScale ?? 1;
+    task.curve = null;
     task.lines = [null];
     task.lineIndex = 0;
     task.lineAdded = false;
@@ -70,6 +76,17 @@ export default class Drawing extends Task {
       this.pointer = new T.Mesh(geom, mat);
       window.scene.add(this.pointer);
     }
+
+    const geom = new T.PlaneGeometry(
+      1.4 * this.curveScale,
+      1 * this.curveScale
+    );
+    const texture = new T.TextureLoader().load(this.curvePath);
+    const mat = new T.MeshStandardMaterial({ map: texture });
+    this.curve = new T.Mesh(geom, mat);
+    this.curve.position.set(0.995, 1.35, 0);
+    this.curve.rotateY(-Math.PI / 2);
+    window.scene.add(this.curve);
   }
 
   onStop() {
@@ -122,6 +139,15 @@ export default class Drawing extends Task {
       pose = this.controller.getPose("right");
       posi.copy(pose.posi);
       ori.copy(pose.ori);
+      if (this.adjustedControl) {
+        let correctionRot = new T.Quaternion(
+          Math.sin(Math.PI / 4),
+          0,
+          0,
+          Math.cos(Math.PI / 4)
+        );
+        ori.multiply(correctionRot);
+      }
       let correctionTrans = new T.Vector3(0, -0.1, 0);
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
