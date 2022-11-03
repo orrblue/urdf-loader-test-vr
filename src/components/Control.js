@@ -89,6 +89,7 @@ export default class Control {
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
         adjustedControl: false,
+        curvePath: "lab",
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
         text: "Projection Perpendicular to Whiteboard.\n\n",
