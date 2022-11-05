@@ -8,6 +8,7 @@ import {
   updateTargetCursor,
   updateRobot,
 } from "../utilities/robot";
+import { lab, hri, ros } from "../utilities/traces";
 import StateMachine from "javascript-state-machine";
 import TeleportVR from "../utilities/teleportvr";
 import Controllers from "./Controllers";
@@ -89,7 +90,8 @@ export default class Control {
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
         adjustedControl: false,
-        curvePath: "lab",
+        trace: lab,
+        curveScale: 0.75,
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
         text: "Projection Perpendicular to Whiteboard.\n\n",
@@ -97,7 +99,8 @@ export default class Control {
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
         adjustedControl: true,
-        curvePath: "hri",
+        trace: hri,
+        curveScale: 0.75,
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
         text: "Projection Parallel to Marker.\n\n",
@@ -109,7 +112,7 @@ export default class Control {
         ]),
         {
           rotationBased: true,
-          curvePath: "ros",
+          trace: ros,
           text: "Remote Control.\n\n",
         }
       ),

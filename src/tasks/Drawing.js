@@ -23,16 +23,16 @@ export default class Drawing extends Task {
       color: options.color ?? "blue",
       linewidth: options.lineWidth ?? 5,
     });
-    task.curvePath = options.curvePath
-      ? `assets/${options.curvePath}_curve.jpg`
-      : null;
+    task.trace = options.trace ?? null;
+    task.traceStart = new T.Vector3();
+    task.traceEnd = new T.Vector3();
     task.curveScale = options.curveScale ?? 1;
-    task.curveStart = options.curveStart ?? new T.Vector3(0.99, 0.95, -0.675);
-    task.curveEnd = options.curveEnd ?? new T.Vector3(0.99, 1.34, 0.55);
     task.distFromCurve = options.distFromCurve ?? 0.05;
     task.started = false;
     task.ended = false;
     task.curve = null;
+    task.startMesh = null;
+    task.endMesh = null;
     task.lines = [null];
     task.lineIndex = 0;
     task.lineAdded = false;
@@ -81,27 +81,36 @@ export default class Drawing extends Task {
       const mat = new T.MeshBasicMaterial({ color: "red" });
       this.pointer = new T.Mesh(geom, mat);
       window.scene.add(this.pointer);
-      const curveGeom = new T.SphereGeometry(0.01);
-      const curveMat = new T.MeshBasicMaterial({ color: "green" });
-      const startMesh = new T.Mesh(curveGeom, curveMat);
-      startMesh.position.copy(this.curveStart);
-      window.scene.add(startMesh);
-      const endMesh = new T.Mesh(curveGeom, curveMat);
-      endMesh.position.copy(this.curveEnd);
-      window.scene.add(endMesh);
     }
 
-    if (this.curvePath != null) {
+    if (this.trace != null) {
       const geom = new T.PlaneGeometry(
         1.4 * this.curveScale,
         1 * this.curveScale
       );
-      const texture = new T.TextureLoader().load(this.curvePath);
-      const mat = new T.MeshStandardMaterial({ map: texture });
+      const mat = new T.MeshStandardMaterial({ map: this.trace.texture });
       this.curve = new T.Mesh(geom, mat);
       this.curve.position.set(0.995, 1.35, 0);
       this.curve.rotateY(-Math.PI / 2);
       window.scene.add(this.curve);
+      this.traceStart.set(
+        this.trace.start.x,
+        1.35 + (this.trace.start.y - 1.35) * this.curveScale,
+        this.trace.start.z * this.curveScale
+      );
+      this.traceEnd.set(
+        this.trace.end.x,
+        1.35 + (this.trace.end.y - 1.35) * this.curveScale,
+        this.trace.end.z * this.curveScale
+      );
+      const curveGeom = new T.SphereGeometry(0.01);
+      const curveMat = new T.MeshBasicMaterial({ color: "green" });
+      this.startMesh = new T.Mesh(curveGeom, curveMat);
+      this.startMesh.position.copy(this.traceStart);
+      window.scene.add(this.startMesh);
+      this.endMesh = new T.Mesh(curveGeom, curveMat);
+      this.endMesh.position.copy(this.traceEnd);
+      window.scene.add(this.endMesh);
     }
   }
 
@@ -120,8 +129,10 @@ export default class Drawing extends Task {
       window.scene.remove(this.pointer);
     }
 
-    if (this.curvePath != null) {
+    if (this.trace != null) {
       window.scene.remove(this.curve);
+      window.scene.remove(this.startMesh);
+      window.scene.remove(this.endMesh);
     }
   }
 
@@ -212,13 +223,15 @@ export default class Drawing extends Task {
       }
     }
 
-    if (dist <= this.distFromWhiteboard && inBounds) {
+    if (Math.abs(dist) <= this.distFromWhiteboard && inBounds) {
       this.points.push(target);
-      if (this.curveStart.distanceTo(target) <= this.distFromCurve) {
-        this.started = true;
-      }
-      if (this.curveEnd.distanceTo(target) <= this.distFromCurve) {
-        this.ended = true;
+      if (this.trace != null) {
+        if (this.traceStart.distanceTo(target) <= this.distFromCurve) {
+          this.started = true;
+        }
+        if (this.traceEnd.distanceTo(target) <= this.distFromCurve) {
+          this.ended = true;
+        }
       }
       if (this.drawVibrationStrength != 0) {
         this.controller
