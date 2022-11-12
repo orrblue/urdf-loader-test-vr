@@ -2,7 +2,10 @@ import * as T from "three";
 import Task from "./Task";
 import Whiteboard from "../objects/Whiteboard";
 import Marker from "../objects/Marker";
-import { getCurrEEPose } from "../utilities/robot";
+import { T_ROS_to_THREE } from "../utilities/globals";
+import { changeReferenceFrame } from "../utilities/math";
+import { getCurrEEPose, setPos } from "../utilities/robot";
+import traces from "../utilities/traces";
 
 export default class Drawing extends Task {
   static async init(params, condition, options = {}) {
@@ -11,6 +14,7 @@ export default class Drawing extends Task {
       whiteboard: await Whiteboard.init(params),
       marker: await Marker.init(params),
     };
+    task.debug = options.debug ?? true;
     task.robotControlled = options.robotControlled ?? true;
     task.adjustedControl = options.adjustedControl ?? false;
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
@@ -18,12 +22,13 @@ export default class Drawing extends Task {
     task.rotationBased = options.rotationBased ?? true;
     task.stopOnCollision = options.stopOnCollision ?? false;
     task.pointerSize = options.pointerSize ?? 0;
-    task.points = [];
+    task.points = [[]];
     task.material = new T.LineBasicMaterial({
       color: options.color ?? "blue",
       linewidth: options.lineWidth ?? 5,
     });
-    task.trace = options.trace ?? null;
+    task.traceName = options.trace ?? "";
+    task.trace = options.trace ? traces[options.trace] : null;
     task.traceStart = new T.Vector3();
     task.traceEnd = new T.Vector3();
     task.curveScale = options.curveScale ?? 1;
@@ -37,6 +42,9 @@ export default class Drawing extends Task {
     task.lineIndex = 0;
     task.lineAdded = false;
     task.pointer = null;
+    task.id = new Date().getTime();
+    task.buffer = [];
+    task.bufferSize = options.bufferSize ?? 500;
     return task;
   }
 
@@ -112,6 +120,35 @@ export default class Drawing extends Task {
       this.endMesh.position.copy(this.traceEnd);
       window.scene.add(this.endMesh);
     }
+
+    const data = {
+      id: this.id,
+      debug: this.debug,
+      robotControlled: this.robotControlled,
+      adjustedControl: this.adjustedControl,
+      distFromWhiteboard: this.distFromWhiteboard,
+      drawVibrationStrength: this.drawVibrationStrength,
+      rotationBased: this.rotationBased,
+      stopOnCollision: this.stopOnCollision,
+      pointerSize: this.pointerSize,
+      color: this.material.color,
+      lineWidth: this.material.linewidth,
+      trace: this.traceName,
+      curveScale: this.curveScale,
+      distFromCurve: this.distFromCurve,
+    };
+    fetch(
+      "https://script.google.com/macros/s/AKfycbxWv-joKoA71hLWZyyCBUAGRf75LQ26yq_3sCi7Cfs_kqHoTZIzbvdNxpNyrvobNYCVkg/exec",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(data),
+      }
+    );
   }
 
   onStop() {
@@ -134,6 +171,25 @@ export default class Drawing extends Task {
       window.scene.remove(this.startMesh);
       window.scene.remove(this.endMesh);
     }
+
+    this.updateRequest(true);
+    const data = {
+      id: this.id,
+      time: new Date().getTime() - this.id,
+      points: this.points,
+    };
+    fetch(
+      "https://script.google.com/macros/s/AKfycbwYXm4Hl7gheI0AVOveRwR8_5a9wx8h8e9_sdZgUFJayOGQh5-B-CuL3mD9dSVw5sDkFQ/exec",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(data),
+      }
+    );
   }
 
   onUpdate(t, info) {
@@ -141,6 +197,7 @@ export default class Drawing extends Task {
     //whiteboard.update(this.world, this.controller);
     this.updateMarker();
     this.draw();
+    this.updateRequest();
 
     // ~ update ui elements ~
 
@@ -156,6 +213,13 @@ export default class Drawing extends Task {
     let posi = new T.Vector3();
     let ori = new T.Quaternion();
     if (this.robotControlled) {
+      if (this.adjustedControl) {
+        let goal = changeReferenceFrame(window.goalEERelThree, T_ROS_to_THREE);
+        let direction = new T.Vector3(-0.75, 0, 0);
+        direction.applyQuaternion(goal.ori);
+        goal.posi.add(direction);
+        setPos(goal);
+      }
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
@@ -224,7 +288,7 @@ export default class Drawing extends Task {
     }
 
     if (Math.abs(dist) <= this.distFromWhiteboard && inBounds) {
-      this.points.push(target);
+      this.points[this.lineIndex].push(target);
       if (this.trace != null) {
         if (this.traceStart.distanceTo(target) <= this.distFromCurve) {
           this.started = true;
@@ -243,18 +307,22 @@ export default class Drawing extends Task {
         this.lineAdded = false;
       }
     } else {
-      this.points = [];
-      if (this.lines[this.lineIndex] != null) {
-        this.lines.push(null);
-        this.lineIndex++;
-      }
       if (this.started && this.ended) {
         this.fsm.next();
       }
+      if (this.lines[this.lineIndex] != null) {
+        this.points.push([]);
+        this.lines.push(null);
+        this.lineIndex++;
+      } else {
+        this.points[this.lineIndex] = [];
+      }
     }
 
-    if (this.points.length > 2) {
-      const geometry = new T.BufferGeometry().setFromPoints(this.points);
+    if (this.points[this.lineIndex].length > 2) {
+      const geometry = new T.BufferGeometry().setFromPoints(
+        this.points[this.lineIndex]
+      );
       this.lines[this.lineIndex] = new T.Line(geometry, this.material);
       window.scene.add(this.lines[this.lineIndex]);
       this.lineAdded = true;
@@ -268,5 +336,30 @@ export default class Drawing extends Task {
     direction.multiplyScalar(dist);
     direction.add(position);
     return { point: direction, dist: dist };
+  }
+
+  updateRequest(onStop = false) {
+    this.buffer.push({
+      id: this.id,
+      time: new Date().getTime(),
+      controller: this.controller.getPose("right"),
+      robot: getCurrEEPose(),
+      marker: this.objects.marker.getState()[0],
+    });
+    if (this.buffer.length >= this.bufferSize || onStop) {
+      fetch(
+        "https://script.google.com/macros/s/AKfycbyfQ9I8vcTCv5opgQRdnkjdVNrrBC9xqvqkHk6uvU89Wm7NfwPYmjQSM2Kpb_lbSThC/exec",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          mode: "no-cors",
+          body: JSON.stringify(this.buffer),
+        }
+      );
+      this.buffer = [];
+    }
   }
 }

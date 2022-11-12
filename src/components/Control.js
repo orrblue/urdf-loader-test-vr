@@ -8,7 +8,6 @@ import {
   updateTargetCursor,
   updateRobot,
 } from "../utilities/robot";
-import { lab, hri, ros } from "../utilities/traces";
 import StateMachine from "javascript-state-machine";
 import TeleportVR from "../utilities/teleportvr";
 import Controllers from "./Controllers";
@@ -87,10 +86,21 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
+      await Drawing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          rotationBased: true,
+          trace: "ros",
+          text: "Remote Control.\n\n",
+        }
+      ),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
         adjustedControl: false,
-        trace: lab,
+        trace: "lab",
         curveScale: 0.75,
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
@@ -99,23 +109,12 @@ export default class Control {
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
         adjustedControl: true,
-        trace: hri,
+        trace: "hri",
         curveScale: 0.75,
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
         text: "Projection Parallel to Marker.\n\n",
       }),
-      await Drawing.init(
-        utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          rotationBased: true,
-          trace: ros,
-          text: "Remote Control.\n\n",
-        }
-      ),
       await GraspingTutorial.init(
         utilities,
         new Condition("drag-control-only", [
