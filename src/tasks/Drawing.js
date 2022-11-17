@@ -4,7 +4,7 @@ import Whiteboard from "../objects/Whiteboard";
 import Marker from "../objects/Marker";
 import { T_ROS_to_THREE } from "../utilities/globals";
 import { changeReferenceFrame } from "../utilities/math";
-import { getCurrEEPose, setPos } from "../utilities/robot";
+import { getCurrEEPose } from "../utilities/robot";
 import traces from "../utilities/traces";
 
 export default class Drawing extends Task {
@@ -78,7 +78,26 @@ export default class Drawing extends Task {
       position: new T.Vector3(1, 0, 0),
       rotation: new T.Euler(0, Math.PI, 0, "XYZ"),
     });
-    if (!this.robotControlled) {
+    if (this.robotControlled) {
+      window.adjustedControl = (goal) => {
+        if (this.adjustedControl) {
+          let direction = new T.Vector3(-0.1, 0, 0);
+          direction.applyQuaternion(goal.ori);
+          goal.posi.add(direction);
+        }
+        if (this.stopOnCollision) {
+          let direction = new T.Vector3(0.2, 0, 0);
+          direction.applyQuaternion(goal.ori);
+          goal.posi.add(direction);
+          if (goal.posi.x > 0.38) {
+            goal.posi.x = 0.38;
+          }
+          direction.multiplyScalar(-1);
+          goal.posi.add(direction);
+        }
+        return goal;
+      };
+    } else {
       this.controller.get().grip.traverse((child) => {
         if (child instanceof T.Mesh) child.visible = false;
       });
@@ -158,6 +177,10 @@ export default class Drawing extends Task {
       window.scene.remove(line);
     }
 
+    window.adjustedControl = (goal) => {
+      return goal;
+    };
+
     this.controller.get().grip.traverse((child) => {
       if (child instanceof T.Mesh) child.visible = true;
     });
@@ -213,13 +236,6 @@ export default class Drawing extends Task {
     let posi = new T.Vector3();
     let ori = new T.Quaternion();
     if (this.robotControlled) {
-      if (this.adjustedControl) {
-        let goal = changeReferenceFrame(window.goalEERelThree, T_ROS_to_THREE);
-        let direction = new T.Vector3(-0.75, 0, 0);
-        direction.applyQuaternion(goal.ori);
-        goal.posi.add(direction);
-        setPos(goal);
-      }
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);

@@ -47,6 +47,9 @@ export default class Control {
       posi: new T.Vector3(),
       ori: new T.Quaternion().identity(),
     };
+    window.adjustedControl = (goal) => {
+      return goal;
+    };
 
     // target cursor
     const targetCursor = new T.Mesh(
@@ -93,6 +96,7 @@ export default class Control {
         ]),
         {
           rotationBased: true,
+          stopOnCollision: true,
           trace: "ros",
           text: "Remote Control.\n\n",
         }

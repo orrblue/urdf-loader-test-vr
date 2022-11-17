@@ -3,7 +3,6 @@ import { loadGLTF } from "../utilities/loaders";
 import RAPIER from "@dimforge/rapier3d";
 import Controllers from "../components/Controllers";
 import SceneObject from "./SceneObject";
-import { setPos } from "../utilities/robot";
 import { T_ROS_to_THREE } from "../utilities/globals";
 import { changeReferenceFrame } from "../utilities/math";
 
@@ -84,18 +83,5 @@ export default class Whiteboard extends SceneObject {
     this.world.removeRigidBody(this.rigidBody);
 
     this.loaded = false;
-  }
-
-  /**
-   * Fakes collision between robot with pen and whiteboard
-   * @param {*} world
-   * @param {Controllers} controller
-   */
-  update(world, controller) {
-    let pos = changeReferenceFrame(window.goalEERelThree, T_ROS_to_THREE);
-    if (pos.posi.x > -0.5) {
-      pos.posi.x = -0.5;
-      setPos(pos);
-    }
   }
 }

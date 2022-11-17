@@ -62,42 +62,39 @@ export function updateRobot() {
     window.goalEERelThree,
     T_ROS_to_THREE
   );
+  const goal = window.adjustedControl(goalEERelRos);
   const currEEAbsThree = getCurrEEPose();
 
-  const deltaPosi = currEEAbsThree.posi.distanceTo(goalEERelRos.posi); // distance difference
-  const deltaOri = currEEAbsThree.ori.angleTo(goalEERelRos.ori); // angle difference
+  const deltaPosi = currEEAbsThree.posi.distanceTo(goal.posi); // distance difference
+  const deltaOri = currEEAbsThree.ori.angleTo(goal.ori); // angle difference
 
   if (deltaPosi > 1e-3 || deltaOri > 1e-3) {
-    setPos(goalEERelRos);
+    const result = window.relaxedIK.solve(
+      [goal.posi.x, goal.posi.y, goal.posi.z],
+      [goal.ori.w, goal.ori.x, goal.ori.y, goal.ori.z]
+    );
+
+    const joints = Object.entries(window.robot.joints).filter(
+      (joint) =>
+        joint[1]._jointType != "fixed" && joint[1].type != "URDFMimicJoint"
+    );
+    joints.forEach((joint) => {
+      const jointIndex = window.robotInfo.joint_ordering.indexOf(joint[0]);
+      if (jointIndex != -1)
+        window.robot.setJointValue(joint[0], result[jointIndex]);
+    });
+
+    window.linkToRigidBody.forEach((rigidBody, link) => {
+      rigidBody.setNextKinematicTranslation(
+        link.getWorldPosition(new T.Vector3())
+      );
+      rigidBody.setNextKinematicRotation(
+        link.getWorldQuaternion(new T.Quaternion())
+      );
+    });
     return true;
   }
   return false;
-}
-
-export function setPos(pos) {
-  const result = window.relaxedIK.solve(
-    [pos.posi.x, pos.posi.y, pos.posi.z],
-    [pos.ori.w, pos.ori.x, pos.ori.y, pos.ori.z]
-  );
-
-  const joints = Object.entries(window.robot.joints).filter(
-    (joint) =>
-      joint[1]._jointType != "fixed" && joint[1].type != "URDFMimicJoint"
-  );
-  joints.forEach((joint) => {
-    const jointIndex = window.robotInfo.joint_ordering.indexOf(joint[0]);
-    if (jointIndex != -1)
-      window.robot.setJointValue(joint[0], result[jointIndex]);
-  });
-
-  window.linkToRigidBody.forEach((rigidBody, link) => {
-    rigidBody.setNextKinematicTranslation(
-      link.getWorldPosition(new T.Vector3())
-    );
-    rigidBody.setNextKinematicRotation(
-      link.getWorldQuaternion(new T.Quaternion())
-    );
-  });
 }
 
 export function resetRobot() {
