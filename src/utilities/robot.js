@@ -30,10 +30,17 @@ export function computeGripper(eePose) {
 }
 
 export function getCurrEEPose() {
-  return {
-    posi: window.robot.links.right_hand.getWorldPosition(new T.Vector3()),
-    ori: window.robot.links.right_hand.getWorldQuaternion(new T.Quaternion()),
-  };
+  if (window.robotName == "sawyer") {
+    return {
+      posi: window.robot.links.right_hand.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.right_hand.getWorldQuaternion(new T.Quaternion()),
+    };
+  } else {
+    return {
+      posi: window.robot.links.finger_tip.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.finger_tip.getWorldQuaternion(new T.Quaternion()),
+    };
+  }
 }
 
 export function getGripperPose(tip = false) {

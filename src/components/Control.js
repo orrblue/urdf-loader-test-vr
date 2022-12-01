@@ -96,14 +96,13 @@ export default class Control {
         ]),
         {
           rotationBased: true,
-          stopOnCollision: true,
+          adjustedControl: true,
           trace: "ros",
           text: "Remote Control.\n\n",
         }
       ),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
-        adjustedControl: false,
         trace: "lab",
         curveScale: 0.75,
         pointerSize: 0.001,

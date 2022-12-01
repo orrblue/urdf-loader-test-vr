@@ -21,7 +21,7 @@ import RAPIER from "@dimforge/rapier3d";
  * @param {String} nn
  * @param {Boolean} loadScreen
  */
-function loadRobot(name, file, info, nn, loadScreen = false) {
+function loadRobot(name, file, info, nn, loadScreen = false, init = false) {
   const loader = new URDFLoader(
     loadScreen
       ? new T.LoadingManager(() => {
@@ -64,37 +64,44 @@ function loadRobot(name, file, info, nn, loadScreen = false) {
       }
     });
 
-    window.robot = robot;
-    window.robotName = name;
+    window.robots[name] = {};
+    window.robots[name].robot = robot;
+    window.robots[name].robotName = name;
 
-    window.robotColliders = {};
-    window.gripperColliders = [];
+    window.robots[name].robotColliders = {};
+    window.robots[name].gripperColliders = [];
 
     initRelaxedIK().then(async () => {
-      window.robotInfo = yaml.load(
+      window.robots[name].robotInfo = yaml.load(
         await fetch(info).then((response) => response.text())
       );
-      window.robotNN = yaml.load(
+      window.robots[name].robotNN = yaml.load(
         await fetch(nn).then((response) => response.text())
       );
 
-      const joints = Object.entries(window.robot.joints).filter(
+      const joints = Object.entries(window.robots[name].robot.joints).filter(
         (joint) =>
           joint[1]._jointType != "fixed" && joint[1].type != "URDFMimicJoint"
       );
       joints.forEach((joint) => {
-        const jointIndex = window.robotInfo.joint_ordering.indexOf(joint[0]);
+        const jointIndex = window.robots[name].robotInfo.joint_ordering.indexOf(
+          joint[0]
+        );
         if (jointIndex != -1)
-          window.robot.setJointValue(
+          window.robots[name].robot.setJointValue(
             joint[0],
-            window.robotInfo.starting_config[jointIndex]
+            window.robots[name].robotInfo.starting_config[jointIndex]
           );
       });
 
-      window.relaxedIK = new RelaxedIK(window.robotInfo, window.robotNN);
+      window.robots[name].relaxedIK = new RelaxedIK(
+        window.robots[name].robotInfo,
+        window.robots[name].robotNN
+      );
       console.log("%cSuccessfully loaded robot config.", "color: green");
 
-      window.linkToRigidBody = new Map();
+      window.robots[name].linkToRigidBody = new Map();
+      window.robots[name].simObjs = new Map();
 
       function initRobotPhysics(currJoint) {
         if (
@@ -134,8 +141,8 @@ function loadRobot(name, file, info, nn, loadScreen = false) {
 
                 const visualGroup = new T.Group();
                 visualGroup.add(urdfVisual);
-                scene.add(visualGroup);
-                window.simObjs.set(rigidBody, visualGroup);
+                //scene.add(visualGroup);
+                window.robots[name].simObjs.set(rigidBody, visualGroup);
               }
 
               if (
@@ -201,18 +208,21 @@ function loadRobot(name, file, info, nn, loadScreen = false) {
                   colliders.push(collider);
                 }
 
-                window.robotColliders[childLink.name] = colliders;
+                window.robots[name].robotColliders[childLink.name] = colliders;
               }
 
               if (childLink.name === "right_gripper_l_finger") {
-                window.leftFinger = { rigidBody, link: childLink };
+                window.robots[name].leftFinger = { rigidBody, link: childLink };
               }
 
               if (childLink.name === "right_gripper_r_finger") {
-                window.rightFinger = { rigidBody, link: childLink };
+                window.robots[name].rightFinger = {
+                  rigidBody,
+                  link: childLink,
+                };
               }
 
-              window.linkToRigidBody.set(childLink, rigidBody);
+              window.robots[name].linkToRigidBody.set(childLink, rigidBody);
               childLink.children.forEach((joint) => {
                 initRobotPhysics(joint);
               });
@@ -232,10 +242,28 @@ function loadRobot(name, file, info, nn, loadScreen = false) {
         initRobotPhysics(joint);
       });
 
-      someInit();
+      if (init) {
+        someInit();
+      }
     });
   });
 }
+
+window.setRobot = (name) => {
+  window.simObjs.forEach((visualGroup, rigidBody) => scene.remove(visualGroup));
+  window.robot = window.robots[name].robot;
+  window.robotName = window.robots[name].robotName;
+  window.robotColliders = window.robots[name].robotColliders;
+  window.gripperColliders = window.robots[name].gripperColliders;
+  window.robotInfo = window.robots[name].robotInfo;
+  window.robotNN = window.robots[name].robotNN;
+  window.relaxedIK = window.robots[name].relaxedIK;
+  window.linkToRigidBody = window.robots[name].linkToRigidBody;
+  window.simObjs = window.robots[name].simObjs;
+  window.leftFinger = window.robots[name].leftFinger;
+  window.rightFinger = window.robots[name].rightFinger;
+  window.simObjs.forEach((visualGroup, rigidBody) => scene.add(visualGroup));
+};
 
 ///////////////////////////////////////////////////////////
 
@@ -260,6 +288,7 @@ const groundCollisionGroups = 0x00020001;
 ground.setCollisionGroups(groundCollisionGroups);
 
 window.simObjs = new Map();
+window.robots = {};
 
 // load robot
 const robots = {
@@ -282,7 +311,8 @@ getURDFFromURL(
       robots.sawyer.file,
       robots.sawyer.info,
       robots.sawyer.nn,
-      true
+      true,
+      false
     );
   }
 );
@@ -291,11 +321,20 @@ getURDFFromURL(
   "https://raw.githubusercontent.com/yepw/robot_configs/master/ur5_description/urdf/ur5_gripper.urdf",
   (blob) => {
     robots.ur5.file = URL.createObjectURL(blob);
-    // loadRobot('ur5', robots.ur5.file, robots.ur5.info, robots.ur5.nn, true);
+    loadRobot(
+      "ur5",
+      robots.ur5.file,
+      robots.ur5.info,
+      robots.ur5.nn,
+      true,
+      true
+    );
   }
 );
 
 async function someInit() {
+  window.setRobot("ur5");
+
   document.querySelector("#toggle-physics").onclick = function () {
     if (lines.parent === scene) scene.remove(lines);
     else scene.add(lines);

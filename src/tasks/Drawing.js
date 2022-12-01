@@ -2,10 +2,9 @@ import * as T from "three";
 import Task from "./Task";
 import Whiteboard from "../objects/Whiteboard";
 import Marker from "../objects/Marker";
-import { T_ROS_to_THREE } from "../utilities/globals";
-import { changeReferenceFrame } from "../utilities/math";
 import { getCurrEEPose } from "../utilities/robot";
 import traces from "../utilities/traces";
+import { SCRIBBLE } from "../utilities/sounds";
 
 export default class Drawing extends Task {
   static async init(params, condition, options = {}) {
@@ -20,7 +19,7 @@ export default class Drawing extends Task {
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.drawVibrationStrength = options.drawVibrationStrength ?? 0;
     task.rotationBased = options.rotationBased ?? true;
-    task.stopOnCollision = options.stopOnCollision ?? false;
+    task.stopOnCollision = options.stopOnCollision ?? true;
     task.pointerSize = options.pointerSize ?? 0;
     task.points = [[]];
     task.material = new T.LineBasicMaterial({
@@ -318,6 +317,7 @@ export default class Drawing extends Task {
           .get()
           .gamepad?.hapticActuators[0].pulse(this.drawVibrationStrength, 18);
       }
+      //SCRIBBLE.play();
       if (this.lineAdded) {
         window.scene.remove(this.lines[this.lineIndex]);
         this.lineAdded = false;
