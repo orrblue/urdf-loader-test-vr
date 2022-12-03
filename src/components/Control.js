@@ -20,6 +20,7 @@ import GraspingTutorial from "../tasks/tutorials/GraspingTutorial";
 import PickAndDrop from "../tasks/PickAndDrop";
 import Stack from "../tasks/Stack";
 import Drawing from "../tasks/Drawing";
+import Erasing from "../tasks/Erasing";
 import End from "../tasks/End";
 
 // modules
@@ -88,6 +89,17 @@ export default class Control {
         new Condition("drag-control-only", [
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
+      ),
+      await Erasing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          trace: "ros",
+          robotControlled: true,
+          text: "Erasing Task.\n\n",
+        }
       ),
       await Drawing.init(
         utilities,

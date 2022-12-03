@@ -198,14 +198,16 @@ function loadRobot(name, file, info, nn, loadScreen = false, init = false) {
                   )
                     .setTranslation(position.x, position.y, position.z)
                     .setRotation(quaternion);
-                  const collider = world.createCollider(
-                    colliderDesc,
-                    rigidBody
-                  );
-                  collider.setActiveEvents(
-                    RAPIER.ActiveEvents.COLLISION_EVENTS
-                  );
-                  colliders.push(collider);
+                  try {
+                    const collider = world.createCollider(
+                      colliderDesc,
+                      rigidBody
+                    );
+                    collider.setActiveEvents(
+                      RAPIER.ActiveEvents.COLLISION_EVENTS
+                    );
+                    colliders.push(collider);
+                  } catch {}
                 }
 
                 window.robots[name].robotColliders[childLink.name] = colliders;
@@ -312,13 +314,13 @@ getURDFFromURL(
       robots.sawyer.info,
       robots.sawyer.nn,
       true,
-      false
+      true
     );
   }
 );
 
 getURDFFromURL(
-  "https://raw.githubusercontent.com/yepw/robot_configs/master/ur5_description/urdf/ur5_gripper.urdf",
+  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/ur5_description/urdf/ur5_gripper.urdf",
   (blob) => {
     robots.ur5.file = URL.createObjectURL(blob);
     loadRobot(
@@ -327,13 +329,13 @@ getURDFFromURL(
       robots.ur5.info,
       robots.ur5.nn,
       true,
-      true
+      false
     );
   }
 );
 
 async function someInit() {
-  window.setRobot("ur5");
+  window.setRobot("sawyer");
 
   document.querySelector("#toggle-physics").onclick = function () {
     if (lines.parent === scene) scene.remove(lines);

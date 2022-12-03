@@ -218,7 +218,7 @@ export default class Task {
     const headset = this.camera;
     const controllerLeft = this.controller.get("left").grip;
     const controllerRight = this.controller.get("right").grip;
-    const saywer = window.robot;
+    const robot = window.robot;
     const objects = this.objects;
 
     const state = [
@@ -275,33 +275,47 @@ export default class Task {
       },
       {
         position: {
-          x: saywer.position.x,
-          y: saywer.position.y,
-          z: saywer.position.z,
+          x: robot.position.x,
+          y: robot.position.y,
+          z: robot.position.z,
         },
         rotation: {
-          x: saywer.quaternion.x,
-          y: saywer.quaternion.y,
-          z: saywer.quaternion.z,
-          w: saywer.quaternion.w,
+          x: robot.quaternion.x,
+          y: robot.quaternion.y,
+          z: robot.quaternion.z,
+          w: robot.quaternion.w,
         },
-        scale: { x: saywer.scale.x, y: saywer.scale.y, z: saywer.scale.z },
+        scale: { x: robot.scale.x, y: robot.scale.y, z: robot.scale.z },
         joints: [],
       },
     ];
 
-    for (const joint of [
-      "right_j0",
-      "right_j1",
-      "right_j2",
-      "right_j3",
-      "right_j4",
-      "right_j5",
-      "right_j6",
-    ]) {
+    let jointNames;
+    if (window.robotName == "sawyer") {
+      jointNames = [
+        "right_j0",
+        "right_j1",
+        "right_j2",
+        "right_j3",
+        "right_j4",
+        "right_j5",
+        "right_j6",
+      ];
+    } else {
+      jointNames = [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint",
+      ];
+    }
+
+    for (const joint of jointNames) {
       state[4].joints.push({
         name: joint,
-        angle: saywer.joints[joint].jointValue[0],
+        angle: robot.joints[joint].jointValue[0],
       });
     }
 
