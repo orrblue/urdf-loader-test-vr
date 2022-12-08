@@ -317,7 +317,7 @@ const robots = {
     info: "https://raw.githubusercontent.com/yepw/robot_configs/master/info_files/ur5_gripper_info.yaml",
     nn: "https://raw.githubusercontent.com/yepw/robot_configs/master/collision_nn_rust/ur5_nn.yaml",
     settings:
-      "https://github.com/kjoseph8/urdf-loader-test-vr/blob/master/relaxed_ik_web/ur5_env_settings.yaml",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/ur5_env_settings.yaml",
   },
 };
 
