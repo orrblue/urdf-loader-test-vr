@@ -1,6 +1,7 @@
 use crate::groove::objective::*;
 use crate::groove::vars::RelaxedIKVars;
 use wasm_bindgen::prelude::*;
+extern crate web_sys;
 
 pub struct ObjectiveMaster {
     pub objectives: Vec<Box<dyn ObjectiveTrait + Send>>,
@@ -30,14 +31,14 @@ impl ObjectiveMaster {
             objectives.push(Box::new(MatchEEPosGoals::new(i)));
             weight_priors.push(2.0);
             objectives.push(Box::new(MatchEEQuatGoals::new(i)));
-            weight_priors.push(1.0);
+            weight_priors.push(2.0);
+            objectives.push(Box::new(EnvCollision::new(i))); weight_priors.push(1.0);
         }
-        objectives.push(Box::new(MinimizeVelocity));   weight_priors.push(2.0);
-        objectives.push(Box::new(MinimizeAcceleration));    weight_priors.push(1.0);
-        objectives.push(Box::new(MinimizeJerk));    weight_priors.push(0.5);
-        // objectives.push(Box::new(JointLimits));    weight_priors.push(1.0);
+        objectives.push(Box::new(MinimizeVelocity));   weight_priors.push(3.0);
+        objectives.push(Box::new(MinimizeAcceleration));    weight_priors.push(2.0);
+        objectives.push(Box::new(MinimizeJerk));    weight_priors.push(1.0);
+        objectives.push(Box::new(JointLimits));    weight_priors.push(1.0);
         objectives.push(Box::new(NNSelfCollision));    weight_priors.push(1.0);
-
         Self{objectives, num_chains, weight_priors, lite: false, finite_diff_grad: true} // fix this
     }
 

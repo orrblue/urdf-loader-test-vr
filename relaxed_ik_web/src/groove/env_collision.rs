@@ -1,8 +1,10 @@
+use crate::utils_rust::yaml_utils::EnvCollisionFileParser;
 use nalgebra::{Vector3, Isometry3, Point3};
 use nalgebra::geometry::{Translation3, UnitQuaternion, Quaternion};
 use ncollide3d::pipeline::{*};
 use ncollide3d::shape::{*};
 use std::collections::BTreeMap;
+use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Debug)]
 pub struct LinkData {
@@ -51,7 +53,7 @@ impl RelaxedIKEnvCollision {
         let link_radius = env_collision_file.robot_link_radius;
         let plane_obstacles = env_collision_file.cuboids;
         let sphere_obstacles = env_collision_file.spheres;
-        let pcd_obstacles = env_collision_file.pcds;
+        // let pcd_obstacles = env_collision_file.pcds;
 
         // The links are part of group 1 and can only interact with obstacles
         let mut link_groups = CollisionGroups::new();
@@ -119,31 +121,31 @@ impl RelaxedIKEnvCollision {
             }
         }
 
-        for i in 0..pcd_obstacles.len() {
-            let pcd_obs = &pcd_obstacles[i];
-            // let mut shapes: Vec<(Isometry3<f64>, ShapeHandle<f64>)> = Vec::new();
-            // for sphere_obs in &pcd_obs.points {
-            //     let sphere = ShapeHandle::new(Ball::new(sphere_obs.radius));
-            //     let sphere_ts = Translation3::new(sphere_obs.tx, sphere_obs.ty, sphere_obs.tz);
-            //     let sphere_rot = UnitQuaternion::identity();
-            //     let sphere_pos = Isometry3::from_parts(sphere_ts, sphere_rot);
-            //     shapes.push((sphere_pos, sphere));
-            // }
-            let mut points: Vec<Point3<f64>> = Vec::new();
-            for sphere_obs in &pcd_obs.points {
-                points.push(Point3::new(sphere_obs.tx, sphere_obs.ty, sphere_obs.tz));
-            }
-            // let pcd = ShapeHandle::new(Compound::new(shapes));
-            let pcd = ShapeHandle::new(ConvexHull::try_from_points(&points).unwrap());
-            let pcd_ts = Translation3::new(pcd_obs.tx, pcd_obs.ty, pcd_obs.tz);
-            let pcd_rot = UnitQuaternion::from_euler_angles(pcd_obs.rx, pcd_obs.ry, pcd_obs.rz);
-            let pcd_pos = Isometry3::from_parts(pcd_ts, pcd_rot);
-            let pcd_data = CollisionObjectData::new(pcd_obs.name.clone(), LinkData::new(false, -1));
-            let pcd_handle = world.add(pcd_pos, pcd, others_groups, proximity_query, pcd_data);
-            if pcd_obs.is_dynamic {
-                dyn_obstacle_handles.push((pcd_handle.0, pcd_handle.1.data().name.clone()));
-            }
-        }
+        // for i in 0..pcd_obstacles.len() {
+        //     let pcd_obs = &pcd_obstacles[i];
+        //     // let mut shapes: Vec<(Isometry3<f64>, ShapeHandle<f64>)> = Vec::new();
+        //     // for sphere_obs in &pcd_obs.points {
+        //     //     let sphere = ShapeHandle::new(Ball::new(sphere_obs.radius));
+        //     //     let sphere_ts = Translation3::new(sphere_obs.tx, sphere_obs.ty, sphere_obs.tz);
+        //     //     let sphere_rot = UnitQuaternion::identity();
+        //     //     let sphere_pos = Isometry3::from_parts(sphere_ts, sphere_rot);
+        //     //     shapes.push((sphere_pos, sphere));
+        //     // }
+        //     let mut points: Vec<Point3<f64>> = Vec::new();
+        //     for sphere_obs in &pcd_obs.points {
+        //         points.push(Point3::new(sphere_obs.tx, sphere_obs.ty, sphere_obs.tz));
+        //     }
+        //     // let pcd = ShapeHandle::new(Compound::new(shapes));
+        //     let pcd = ShapeHandle::new(ConvexHull::try_from_points(&points).unwrap());
+        //     let pcd_ts = Translation3::new(pcd_obs.tx, pcd_obs.ty, pcd_obs.tz);
+        //     let pcd_rot = UnitQuaternion::from_euler_angles(pcd_obs.rx, pcd_obs.ry, pcd_obs.rz);
+        //     let pcd_pos = Isometry3::from_parts(pcd_ts, pcd_rot);
+        //     let pcd_data = CollisionObjectData::new(pcd_obs.name.clone(), LinkData::new(false, -1));
+        //     let pcd_handle = world.add(pcd_pos, pcd, others_groups, proximity_query, pcd_data);
+        //     if pcd_obs.is_dynamic {
+        //         dyn_obstacle_handles.push((pcd_handle.0, pcd_handle.1.data().name.clone()));
+        //     }
+        // }
         
         return Self{world, link_radius, link_handles, dyn_obstacle_handles, active_pairs, active_obstacles};
     }

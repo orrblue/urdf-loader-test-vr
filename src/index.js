@@ -21,7 +21,15 @@ import RAPIER from "@dimforge/rapier3d";
  * @param {String} nn
  * @param {Boolean} loadScreen
  */
-function loadRobot(name, file, info, nn, loadScreen = false, init = false) {
+function loadRobot(
+  name,
+  file,
+  info,
+  nn,
+  settings,
+  loadScreen = false,
+  init = false
+) {
   const loader = new URDFLoader(
     loadScreen
       ? new T.LoadingManager(() => {
@@ -78,6 +86,9 @@ function loadRobot(name, file, info, nn, loadScreen = false, init = false) {
       window.robots[name].robotNN = yaml.load(
         await fetch(nn).then((response) => response.text())
       );
+      window.robots[name].settings = yaml.load(
+        await fetch(settings).then((response) => response.text())
+      );
 
       const joints = Object.entries(window.robots[name].robot.joints).filter(
         (joint) =>
@@ -96,7 +107,8 @@ function loadRobot(name, file, info, nn, loadScreen = false, init = false) {
 
       window.robots[name].relaxedIK = new RelaxedIK(
         window.robots[name].robotInfo,
-        window.robots[name].robotNN
+        window.robots[name].robotNN,
+        window.robots[name].settings
       );
       console.log("%cSuccessfully loaded robot config.", "color: green");
 
@@ -259,6 +271,7 @@ window.setRobot = (name) => {
   window.gripperColliders = window.robots[name].gripperColliders;
   window.robotInfo = window.robots[name].robotInfo;
   window.robotNN = window.robots[name].robotNN;
+  window.settings = window.robots[name].settings;
   window.relaxedIK = window.robots[name].relaxedIK;
   window.linkToRigidBody = window.robots[name].linkToRigidBody;
   window.simObjs = window.robots[name].simObjs;
@@ -297,10 +310,14 @@ const robots = {
   sawyer: {
     info: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/info_files/sawyer_info.yaml",
     nn: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/collision_nn_rust/sawyer_nn.yaml",
+    settings:
+      "https://raw.githubusercontent.com/yepw/robot_configs/master/sawyer_description/env_settings.yaml",
   },
   ur5: {
     info: "https://raw.githubusercontent.com/yepw/robot_configs/master/info_files/ur5_gripper_info.yaml",
     nn: "https://raw.githubusercontent.com/yepw/robot_configs/master/collision_nn_rust/ur5_nn.yaml",
+    settings:
+      "https://raw.githubusercontent.com/yepw/robot_configs/master/ur5_description/env_settings.yaml",
   },
 };
 
@@ -313,8 +330,9 @@ getURDFFromURL(
       robots.sawyer.file,
       robots.sawyer.info,
       robots.sawyer.nn,
+      robots.sawyer.settings,
       true,
-      true
+      false
     );
   }
 );
@@ -328,14 +346,15 @@ getURDFFromURL(
       robots.ur5.file,
       robots.ur5.info,
       robots.ur5.nn,
+      robots.ur5.settings,
       true,
-      false
+      true
     );
   }
 );
 
 async function someInit() {
-  window.setRobot("sawyer");
+  window.setRobot("ur5");
 
   document.querySelector("#toggle-physics").onclick = function () {
     if (lines.parent === scene) scene.remove(lines);

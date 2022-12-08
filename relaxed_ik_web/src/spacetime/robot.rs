@@ -5,6 +5,8 @@ use serde::{Serialize, Deserialize};
 pub struct RobotConstructorData {
     pub joint_names: Vec<Vec<String>>,
     pub joint_ordering: Vec<String>,
+    pub num_chains: usize,
+    pub num_dof: usize,
     pub collision_file_name: String,
     pub collision_nn_file: String,
     pub axis_types: Vec<Vec<String>>,
@@ -13,7 +15,7 @@ pub struct RobotConstructorData {
     pub displacements: Vec< Vec<nalgebra::Vector3<f64>>,>,
     pub disp_offsets: Vec<nalgebra::Vector3<f64>>,
     pub rot_offsets: Vec<Vec<Vec<f64>>>,
-    pub joint_types: Vec<Vec<String>>
+    pub joint_types: Vec<Vec<String>>,
 }
 
 #[derive(Clone, Debug)]
@@ -55,8 +57,8 @@ impl Robot {
         let arms = vec![arm];
         let joint_names = config.joint_names;
         let joint_ordering = config.joint_ordering;
-        let num_chains = 1;
-        let num_dof = 7;
+        let num_chains = config.num_chains;
+        let num_dof = config.num_dof;
         let subchain_indices = Robot::get_subchain_indices(&joint_names, &joint_ordering);
         let mut __subchain_outputs: Vec<Vec<f64>> = Vec::new();
         for i in 0..subchain_indices.len() {

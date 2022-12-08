@@ -23,7 +23,7 @@ pub struct ArmConstructData {
 #[derive(Clone, Debug)]
 pub struct Arm {
     axis_types: Vec<String>,
-    displacements: Vec<nalgebra::Vector3<f64>>,
+    pub displacements: Vec<nalgebra::Vector3<f64>>,
     disp_offset: nalgebra::Vector3<f64>,
     pos_offsets: Vec<nalgebra::Vector3<f64>>,
     rot_offsets: Vec<Vec<f64>>,
