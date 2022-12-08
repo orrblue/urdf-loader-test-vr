@@ -21,7 +21,7 @@ export default class Erasing extends Task {
     task.points = [[]];
     task.material = new T.LineBasicMaterial({
       color: "white",
-      linewidth: options.lineWidth ?? 5,
+      linewidth: options.lineWidth ?? 500,
     });
     task.traceName = options.trace ?? "";
     task.trace = options.trace ? traces[options.trace] : null;

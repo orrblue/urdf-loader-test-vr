@@ -103,7 +103,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/base.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/base.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -131,7 +131,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/shoulder.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/shoulder.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -159,7 +159,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/upperarm.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/upperarm.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -187,7 +187,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/forearm.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/forearm.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -215,7 +215,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/wrist1.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/wrist1.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -243,7 +243,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/wrist2.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/wrist2.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -271,7 +271,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/wrist3.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/wrist3.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -384,7 +384,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://ur5_description/meshes/collision/robotiq_arg2f_base_link.dae"/>
+        <mesh filename="package://ur5_description/meshes/collision/robotiq_arg2f_base_link.stl"/>
       </geometry>
     </collision>
   </link>

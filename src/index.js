@@ -225,11 +225,17 @@ function loadRobot(
                 window.robots[name].robotColliders[childLink.name] = colliders;
               }
 
-              if (childLink.name === "right_gripper_l_finger") {
+              if (
+                childLink.name === "right_gripper_l_finger" ||
+                childLink.name === "left_outer_finger"
+              ) {
                 window.robots[name].leftFinger = { rigidBody, link: childLink };
               }
 
-              if (childLink.name === "right_gripper_r_finger") {
+              if (
+                childLink.name === "right_gripper_r_finger" ||
+                childLink.name === "right_outer_finger"
+              ) {
                 window.robots[name].rightFinger = {
                   rigidBody,
                   link: childLink,
@@ -257,7 +263,7 @@ function loadRobot(
       });
 
       if (init) {
-        someInit();
+        someInit(name);
       }
     });
   });
@@ -332,7 +338,7 @@ getURDFFromURL(
       robots.sawyer.nn,
       robots.sawyer.settings,
       true,
-      false
+      true
     );
   }
 );
@@ -348,13 +354,13 @@ getURDFFromURL(
       robots.ur5.nn,
       robots.ur5.settings,
       true,
-      true
+      false
     );
   }
 );
 
-async function someInit() {
-  window.setRobot("ur5");
+async function someInit(name) {
+  window.setRobot(name);
 
   document.querySelector("#toggle-physics").onclick = function () {
     if (lines.parent === scene) scene.remove(lines);

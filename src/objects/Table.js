@@ -157,7 +157,7 @@ export default class Table extends SceneObject {
       for (const collider of colliders) {
         world.contactsWith(collider, (collider2) => {
           if (this.colliders.includes(collider2) && !tableContact) {
-            controller.get().gamepad?.hapticActuators[0].pulse(1, 18);
+            //controller.get().gamepad?.hapticActuators[0].pulse(1, 18);
             tableContact = true;
           }
         });

@@ -197,7 +197,7 @@ export default class Task {
       "headset",
       "controller-left",
       "controller-right",
-      "sawyer",
+      window.robotName,
     ];
     for (const name in this.objects) {
       const object = this.objects[name];

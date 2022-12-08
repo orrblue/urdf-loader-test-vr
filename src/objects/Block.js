@@ -116,30 +116,57 @@ export default class Block extends SceneObject {
    * @param {} world
    */
   update(world, gripper) {
-    const pos1 = window.robot.links[
-      "right_gripper_l_finger_tip"
-    ].getWorldPosition(new T.Vector3());
-    const pos2 = window.robot.links[
-      "right_gripper_r_finger_tip"
-    ].getWorldPosition(new T.Vector3());
+    let pos1;
+    let pos2;
+    if (window.robotName == "sawyer") {
+      pos1 = window.robot.links["right_gripper_l_finger_tip"].getWorldPosition(
+        new T.Vector3()
+      );
+      pos2 = window.robot.links["right_gripper_r_finger_tip"].getWorldPosition(
+        new T.Vector3()
+      );
+    } else {
+      pos1 = window.robot.links["left_inner_finger_pad"].getWorldPosition(
+        new T.Vector3()
+      );
+      pos2 = window.robot.links["right_inner_finger_pad"].getWorldPosition(
+        new T.Vector3()
+      );
+    }
     const width = pos1.distanceTo(pos2);
 
     if (!this.grasped) {
       let [left, right] = [false, false];
 
-      world.contactsWith(
-        window.robotColliders["right_gripper_l_finger_tip"][0],
-        (collider) => {
-          if (collider === this.colliders[0]) left = true;
-        }
-      );
+      if (window.robotName == "sawyer") {
+        world.contactsWith(
+          window.robotColliders["right_gripper_l_finger_tip"][0],
+          (collider) => {
+            if (collider === this.colliders[0]) left = true;
+          }
+        );
 
-      world.contactsWith(
-        window.robotColliders["right_gripper_r_finger_tip"][0],
-        (collider) => {
-          if (collider === this.colliders[0]) right = true;
-        }
-      );
+        world.contactsWith(
+          window.robotColliders["right_gripper_r_finger_tip"][0],
+          (collider) => {
+            if (collider === this.colliders[0]) right = true;
+          }
+        );
+      } else {
+        world.contactsWith(
+          window.robotColliders["left_inner_finger_pad"][0],
+          (collider) => {
+            if (collider === this.colliders[0]) left = true;
+          }
+        );
+
+        world.contactsWith(
+          window.robotColliders["right_inner_finger_pad"][0],
+          (collider) => {
+            if (collider === this.colliders[0]) right = true;
+          }
+        );
+      }
 
       if (
         left &&

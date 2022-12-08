@@ -37,8 +37,8 @@ export function getCurrEEPose() {
     };
   } else {
     return {
-      posi: window.robot.links.finger_tip.getWorldPosition(new T.Vector3()),
-      ori: window.robot.links.finger_tip.getWorldQuaternion(new T.Quaternion()),
+      posi: window.robot.links.ee_link.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.ee_link.getWorldQuaternion(new T.Quaternion()),
     };
   }
 }
