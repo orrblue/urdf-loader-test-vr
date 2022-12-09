@@ -1,11 +1,30 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('./urdf-viewer-element.js')) :
-    typeof define === 'function' && define.amd ? define(['three', './urdf-viewer-element.js'], factory) :
+    typeof define === 'function' && define.amd ? define(['three', './urdf-viewer-element'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.URDFManipulator = factory(global.THREE, global.URDFViewer));
-}(this, (function (THREE, URDFViewer) { 'use strict';
+})(this, (function (THREE, URDFViewer) { 'use strict';
 
     function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
+    function _interopNamespace(e) {
+        if (e && e.__esModule) return e;
+        var n = Object.create(null);
+        if (e) {
+            Object.keys(e).forEach(function (k) {
+                if (k !== 'default') {
+                    var d = Object.getOwnPropertyDescriptor(e, k);
+                    Object.defineProperty(n, k, d.get ? d : {
+                        enumerable: true,
+                        get: function () { return e[k]; }
+                    });
+                }
+            });
+        }
+        n["default"] = e;
+        return Object.freeze(n);
+    }
+
+    var THREE__namespace = /*#__PURE__*/_interopNamespace(THREE);
     var URDFViewer__default = /*#__PURE__*/_interopDefaultLegacy(URDFViewer);
 
     // Find the nearest parent that is a joint
@@ -344,7 +363,7 @@
     // joint-mouseout: Fired when a joint is no longer hovered over
     // manipulate-start: Fires when a joint is manipulated
     // manipulate-end: Fires when a joint is done being manipulated
-    class URDFManipulator extends URDFViewer__default['default'] {
+    class URDFManipulator extends URDFViewer__default["default"] {
 
         static get observedAttributes() {
 
@@ -364,7 +383,7 @@
 
             // The highlight material
             this.highlightMaterial =
-                new THREE.MeshPhongMaterial({
+                new THREE__namespace.MeshPhongMaterial({
                     shininess: 10,
                     color: this.highlightColor,
                     emissive: this.highlightColor,
@@ -484,5 +503,5 @@
 
     return URDFManipulator;
 
-})));
+}));
 //# sourceMappingURL=urdf-manipulator-element.js.map

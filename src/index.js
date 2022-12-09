@@ -338,13 +338,13 @@ getURDFFromURL(
       robots.sawyer.nn,
       robots.sawyer.settings,
       true,
-      true
+      false
     );
   }
 );
 
 getURDFFromURL(
-  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/ur5_description/urdf/ur5_gripper.urdf",
+  "https://raw.githubusercontent.com/yepw/robot_configs/master/ur5_description/urdf/ur5_gripper.urdf",
   (blob) => {
     robots.ur5.file = URL.createObjectURL(blob);
     loadRobot(
@@ -354,7 +354,7 @@ getURDFFromURL(
       robots.ur5.nn,
       robots.ur5.settings,
       true,
-      false
+      true
     );
   }
 );

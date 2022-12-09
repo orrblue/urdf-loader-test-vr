@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js';
-import { URDFRobot, URDFJoint, URDFLink, URDFCollider, URDFVisual, URDFMimicJoint, URDFInertial } from './URDFClasses.js';
+import { URDFRobot, URDFJoint, URDFLink, URDFCollider, URDFVisual, URDFMimicJoint } from './URDFClasses.js';
 
 /*
 Reference coordinate frames for THREE.js and ROS.
@@ -62,7 +62,6 @@ class URDFLoader {
         this.loadMeshCb = this.defaultMeshLoader.bind(this);
         this.parseVisual = true;
         this.parseCollision = false;
-        this.parseInertial = false;
         this.packages = '';
         this.workingPath = '';
         this.fetchOptions = {};
@@ -148,7 +147,6 @@ class URDFLoader {
         const loadMeshCb = this.loadMeshCb;
         const parseVisual = this.parseVisual;
         const parseCollision = this.parseCollision;
-        const parseInertial = this.parseInertial;
         const workingPath = this.workingPath;
         const manager = this.manager;
         const linkMap = {};
@@ -373,13 +371,7 @@ class URDFLoader {
 
                     obj.limit.lower = parseFloat(n.getAttribute('lower') || obj.limit.lower);
                     obj.limit.upper = parseFloat(n.getAttribute('upper') || obj.limit.upper);
-                    obj.limit.effort = parseFloat(n.getAttribute('effort') || obj.limit.effort);
-                    obj.limit.velocity = parseFloat(n.getAttribute('velocity') || obj.limit.velocity);
 
-                } else if (type === 'dynamics') {
-
-                    obj.damping = parseFloat(n.getAttribute('damping') || obj.damping);
-                    obj.friction = parseFloat(n.getAttribute('friction') || obj.friction);
                 }
             });
 
@@ -388,9 +380,6 @@ class URDFLoader {
             obj.add(child);
             applyRotation(obj, rpy);
             obj.position.set(xyz[0], xyz[1], xyz[2]);
-
-            // obj.origPosition.set(xyz[0], xyz[1], xyz[2]);
-            // obj.origQuaternion.setFromEuler( new THREE.Euler(rpy[0], rpy[1], rpy[2]));
 
             // Set up the rotate function
             const axisNode = children.filter(n => n.nodeName.toLowerCase() === 'axis')[0];
@@ -463,26 +452,6 @@ class URDFLoader {
 
             }
 
-            if (parseInertial) {
-
-                const inertialNodes = children.filter(n => n.nodeName.toLowerCase() === 'inertial');
-                inertialNodes.forEach(n => {
-
-                    const i = processLinkElement(n);
-                    target.add(i);
-
-                    if (n.hasAttribute('name')) {
-
-                        const name = n.getAttribute('name');
-                        i.name = name;
-                        i.urdfName = name;
-
-                    }
-
-
-                });
-            }
-
             return target;
 
         }
@@ -532,6 +501,7 @@ class URDFLoader {
         // Process the visual and collision nodes into meshes
         function processLinkElement(vn, materialMap = {}) {
 
+            const isCollisionNode = vn.nodeName.toLowerCase() === 'collision';
             const children = [ ...vn.children ];
             let material = null;
 
@@ -556,10 +526,7 @@ class URDFLoader {
 
             }
 
-
-            const name = vn.nodeName.toLowerCase();
-            const group = (name === 'collision') ? new URDFCollider() : 
-                          (name === 'visual') ? new URDFVisual() : new URDFInertial();
+            const group = isCollisionNode ? new URDFCollider() : new URDFVisual();
             group.urdfNode = vn;
 
             children.forEach(n => {
@@ -657,28 +624,6 @@ class URDFLoader {
                     group.rotation.set(0, 0, 0);
                     applyRotation(group, rpy);
 
-                } else if (type === 'mass') {
-
-                    const mass = parseFloat(n.getAttribute('value'))
-                    group.mass = mass;
-
-                } else if (type === 'inertia') {
-
-
-                    const ixx = parseFloat(n.getAttribute('ixx'));
-                    const ixy = parseFloat(n.getAttribute('ixy'));
-                    const ixz = parseFloat(n.getAttribute('ixz'));
-                    const iyy = parseFloat(n.getAttribute('iyy'));
-                    const iyz = parseFloat(n.getAttribute('iyz'));
-                    const izz = parseFloat(n.getAttribute('izz'));
-
-                    group.inertia = new THREE.Matrix3();
-                    group.inertia.set(
-                        ixx, ixy, ixz,
-                        ixy, iyy, iyz,
-                        ixz, iyz, izz
-                    )
-                    
                 }
 
             });

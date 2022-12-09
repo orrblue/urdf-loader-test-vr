@@ -1,4 +1,4 @@
-import { Object3D, Vector3, Quaternion } from 'three';
+import { Object3D, Vector3 } from 'three';
 
 class URDFBase extends Object3D {
 
@@ -42,18 +42,6 @@ class URDFVisual extends URDFBase {
         super(...args);
         this.isURDFVisual = true;
         this.type = 'URDFVisual';
-
-    }
-
-}
-
-class URDFInertial extends URDFBase {
-
-    constructor(...args) {
-
-        super(...args);
-        this.isURDFInertial = true;
-        this.type = 'URDFInertial';
 
     }
 
@@ -127,8 +115,8 @@ class URDFJoint extends URDFBase {
         this.limit = { lower: 0, upper: 0 };
         this.ignoreLimits = false;
 
-        this.origPosition = null; //new Vector3();
-        this.origQuaternion = null //new Quaternion();
+        this.origPosition = null;
+        this.origQuaternion = null;
 
         this.mimicJoints = [];
 
@@ -411,4 +399,4 @@ class URDFRobot extends URDFLink {
 
 }
 
-export { URDFRobot, URDFLink, URDFJoint, URDFMimicJoint, URDFVisual, URDFCollider, URDFInertial};
+export { URDFRobot, URDFLink, URDFJoint, URDFMimicJoint, URDFVisual, URDFCollider };

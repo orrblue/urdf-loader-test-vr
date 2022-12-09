@@ -90,6 +90,14 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
+      await Drawing.init(utilities, new Condition("drag-control-only", []), {
+        robotControlled: false,
+        trace: "lab",
+        curveScale: 0.75,
+        pointerSize: 0.001,
+        distFromWhiteboard: 0.025,
+        text: "Projection Perpendicular to Whiteboard.\n\n",
+      }),
       await Erasing.init(
         utilities,
         new Condition("remote-control-only", [
@@ -101,14 +109,6 @@ export default class Control {
           text: "Erasing Task.\n\n",
         }
       ),
-      await Drawing.init(utilities, new Condition("drag-control-only", []), {
-        robotControlled: false,
-        trace: "lab",
-        curveScale: 0.75,
-        pointerSize: 0.001,
-        distFromWhiteboard: 0.025,
-        text: "Projection Perpendicular to Whiteboard.\n\n",
-      }),
       await Drawing.init(
         utilities,
         new Condition("remote-control-only", [
