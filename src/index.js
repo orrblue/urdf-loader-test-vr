@@ -344,7 +344,7 @@ getURDFFromURL(
 );
 
 getURDFFromURL(
-  "https://raw.githubusercontent.com/yepw/robot_configs/master/ur5_description/urdf/ur5_gripper.urdf",
+  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/ur5_description/urdf/ur5_gripper.urdf",
   (blob) => {
     robots.ur5.file = URL.createObjectURL(blob);
     loadRobot(
