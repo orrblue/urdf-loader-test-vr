@@ -3,7 +3,7 @@ import Task from "./Task";
 import Whiteboard from "../objects/Whiteboard";
 import Eraser from "../objects/Eraser";
 import { getCurrEEPose } from "../utilities/robot";
-import traces from "../utilities/traces";
+import erasePaths from "../utilities/erasePaths";
 import { SCRIBBLE } from "../utilities/sounds";
 
 export default class Erasing extends Task {
@@ -18,18 +18,14 @@ export default class Erasing extends Task {
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
     task.stopOnCollision = options.stopOnCollision ?? true;
-    task.points = [[]];
     task.material = new T.LineBasicMaterial({
-      color: "white",
-      linewidth: options.lineWidth ?? 500,
+      color: "blue",
+      linewidth: options.lineWidth ?? 5,
     });
-    task.traceName = options.trace ?? "";
-    task.trace = options.trace ? traces[options.trace] : null;
-    task.curveScale = options.curveScale ?? 1;
-    task.curve = null;
-    task.lines = [null];
-    task.lineIndex = 0;
-    task.lineAdded = false;
+    const pathName = options.path ?? "line";
+    task.pathName = pathName;
+    task.points = erasePaths[pathName];
+    task.lines = [[]];
     task.id = new Date().getTime();
     task.buffer = [];
     task.bufferSize = options.bufferSize ?? 500;
@@ -69,14 +65,18 @@ export default class Erasing extends Task {
     if (this.robotControlled) {
       window.adjustedControl = (goal) => {
         if (this.stopOnCollision) {
-          let direction = new T.Vector3(0.15, 0, 0);
-          direction.applyQuaternion(goal.ori);
-          goal.posi.add(direction);
-          if (goal.posi.x > 0.38) {
-            goal.posi.x = 0.38;
+          for (let y = -0.075; y <= 0.075; y += 0.15) {
+            for (let z = -0.025; z <= 0.025; z += 0.05) {
+              let direction = new T.Vector3(0.15, y, z);
+              direction.applyQuaternion(goal.ori);
+              goal.posi.add(direction);
+              if (goal.posi.x > 0.4) {
+                goal.posi.x = 0.4;
+              }
+              direction.multiplyScalar(-1);
+              goal.posi.add(direction);
+            }
           }
-          direction.multiplyScalar(-1);
-          goal.posi.add(direction);
         }
         return goal;
       };
@@ -84,18 +84,6 @@ export default class Erasing extends Task {
       this.controller.get().grip.traverse((child) => {
         if (child instanceof T.Mesh) child.visible = false;
       });
-    }
-
-    if (this.trace != null) {
-      const geom = new T.PlaneGeometry(
-        1.4 * this.curveScale,
-        1 * this.curveScale
-      );
-      const mat = new T.MeshStandardMaterial({ map: this.trace.texture });
-      this.curve = new T.Mesh(geom, mat);
-      this.curve.position.set(0.995, 1.35, 0);
-      this.curve.rotateY(-Math.PI / 2);
-      window.scene.add(this.curve);
     }
 
     const data = {
@@ -106,8 +94,7 @@ export default class Erasing extends Task {
       eraseVibrationStrength: this.eraseVibrationStrength,
       stopOnCollision: this.stopOnCollision,
       lineWidth: this.material.linewidth,
-      trace: this.traceName,
-      curveScale: this.curveScale,
+      erasePath: this.pathName,
     };
     /*
     fetch(
@@ -140,10 +127,6 @@ export default class Erasing extends Task {
       if (child instanceof T.Mesh) child.visible = true;
     });
 
-    if (this.trace != null) {
-      window.scene.remove(this.curve);
-    }
-
     this.updateRequest(true);
     /*
     const data = {
@@ -169,6 +152,7 @@ export default class Erasing extends Task {
   onUpdate(t, info) {
     const whiteboard = this.objects.whiteboard;
     //whiteboard.update(this.world, this.controller);
+    this.renderLines();
     this.updateEraser();
     this.erase();
     this.updateRequest();
@@ -180,6 +164,30 @@ export default class Erasing extends Task {
     this.trialCounterText?.set(
       `Trial: ${Number(this.fsm.state) + 1} / ${this.numRounds}`
     );
+  }
+
+  renderLines() {
+    for (let line of this.lines) {
+      window.scene.remove(line);
+    }
+    this.lines = [];
+    for (let points of this.points) {
+      const geometry = new T.BufferGeometry().setFromPoints(points);
+      const line = new T.Line(geometry, this.material);
+      window.scene.add(line);
+      this.lines.push(line);
+    }
+  }
+
+  erasePoint(i, j) {
+    let points = this.points[i];
+    if (j > 1) {
+      this.points.push(points.slice(0, j));
+    }
+    if (j < points.length - 2) {
+      this.points.push(points.slice(j + 1));
+    }
+    this.points.splice(i, 1);
   }
 
   updateEraser() {
@@ -214,8 +222,19 @@ export default class Erasing extends Task {
       let correctionTrans = new T.Vector3(0, -0.1, 0);
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
-      if (this.stopOnCollision && posi.x >= 0.995) {
-        posi.x = 0.995;
+      if (this.stopOnCollision) {
+        for (let x = -0.075; x <= 0.075; x += 0.15) {
+          for (let z = -0.025; z <= 0.025; z += 0.05) {
+            let direction = new T.Vector3(x, 0, z);
+            direction.applyQuaternion(ori);
+            posi.add(direction);
+            if (posi.x > 1) {
+              posi.x = 1;
+            }
+            direction.multiplyScalar(-1);
+            posi.add(direction);
+          }
+        }
       }
     }
     let rot = new T.Euler();
@@ -233,38 +252,34 @@ export default class Erasing extends Task {
     const target = new T.Vector3(0.99, position.y, position.z);
     const dist = 0.99 - position.x;
 
-    const inBounds =
-      target.y > 0.85 && target.y < 1.85 && target.z > -0.7 && target.z < 0.7;
-
-    if (Math.abs(dist) <= this.distFromWhiteboard && inBounds) {
-      this.points[this.lineIndex].push(target);
+    if (Math.abs(dist) <= this.distFromWhiteboard) {
+      let i = 0;
+      while (i < this.points.length) {
+        for (let j = 0; j < this.points[i].length; j++) {
+          let erased = false;
+          for (let x = -0.05; x <= 0.05; x += 0.025) {
+            let direction = new T.Vector3(x, 0, 0);
+            direction.applyQuaternion(rotation);
+            direction.add(target);
+            if (this.points[i][j].distanceTo(direction) < 0.025) {
+              erased = true;
+              break;
+            }
+          }
+          if (erased) {
+            this.erasePoint(i, j);
+            i--;
+            break;
+          }
+        }
+        i++;
+      }
       if (this.eraseVibrationStrength != 0) {
         this.controller
           .get()
           .gamepad?.hapticActuators[0].pulse(this.eraseVibrationStrength, 18);
       }
       //SCRIBBLE.play();
-      if (this.lineAdded) {
-        window.scene.remove(this.lines[this.lineIndex]);
-        this.lineAdded = false;
-      }
-    } else {
-      if (this.lines[this.lineIndex] != null) {
-        this.points.push([]);
-        this.lines.push(null);
-        this.lineIndex++;
-      } else {
-        this.points[this.lineIndex] = [];
-      }
-    }
-
-    if (this.points[this.lineIndex].length > 2) {
-      const geometry = new T.BufferGeometry().setFromPoints(
-        this.points[this.lineIndex]
-      );
-      this.lines[this.lineIndex] = new T.Line(geometry, this.material);
-      window.scene.add(this.lines[this.lineIndex]);
-      this.lineAdded = true;
     }
   }
 
