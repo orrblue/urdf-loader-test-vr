@@ -15,7 +15,7 @@ export default class Erasing extends Task {
     };
     task.debug = options.debug ?? true;
     task.robotControlled = options.robotControlled ?? true;
-    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
+    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.01;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
     task.stopOnCollision = options.stopOnCollision ?? true;
     task.material = new T.LineBasicMaterial({
@@ -250,7 +250,6 @@ export default class Erasing extends Task {
     let position = state.position;
     const rotation = state.rotation;
     const target = new T.Vector3(0.99, position.y, position.z);
-    const dist = 0.99 - position.x;
 
     let nearWhiteboard = true;
     for (let x = -0.075; x <= 0.075; x += 0.15) {
