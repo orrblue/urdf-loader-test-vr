@@ -252,7 +252,19 @@ export default class Erasing extends Task {
     const target = new T.Vector3(0.99, position.y, position.z);
     const dist = 0.99 - position.x;
 
-    if (Math.abs(dist) <= this.distFromWhiteboard) {
+    let nearWhiteboard = true;
+    for (let x = -0.075; x <= 0.075; x += 0.15) {
+      for (let z = -0.025; z <= 0.025; z += 0.05) {
+        let direction = new T.Vector3(x, 0, z);
+        direction.applyQuaternion(rotation);
+        direction.add(position);
+        if (0.99 - direction.x > this.distFromWhiteboard) {
+          nearWhiteboard = false;
+        }
+      }
+    }
+
+    if (nearWhiteboard) {
       let i = 0;
       while (i < this.points.length) {
         for (let j = 0; j < this.points[i].length; j++) {
