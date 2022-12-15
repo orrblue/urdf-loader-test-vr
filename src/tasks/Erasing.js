@@ -252,6 +252,7 @@ export default class Erasing extends Task {
     const target = new T.Vector3(0.99, position.y, position.z);
 
     let nearWhiteboard = true;
+    let corners;
     for (let x = -0.075; x <= 0.075; x += 0.15) {
       for (let z = -0.025; z <= 0.025; z += 0.05) {
         let direction = new T.Vector3(x, 0, z);
@@ -260,24 +261,34 @@ export default class Erasing extends Task {
         if (0.99 - direction.x > this.distFromWhiteboard) {
           nearWhiteboard = false;
         }
+        corners.push({ y: direction.y, z: direction.z });
       }
     }
+
+    const slope1 =
+      (corners[0].y - corners[1].y) / (corners[0].z - corners[1].z);
+    const intercept1 = corners[0].y - slope1 * corners[0].z;
+    const intercept2 = corners[3].y - slope1 * corners[3].z;
+    const slope2 =
+      (corners[1].y - corners[3].y) / (corners[1].z - corners[3].z);
+    const intercept3 = corners[0].y - slope2 * corners[0].z;
+    const intercept4 = corners[3].y - slope2 * corners[3].z;
 
     if (nearWhiteboard) {
       let i = 0;
       while (i < this.points.length) {
         for (let j = 0; j < this.points[i].length; j++) {
-          let erased = false;
-          for (let x = -0.05; x <= 0.05; x += 0.025) {
-            let direction = new T.Vector3(x, 0, 0);
-            direction.applyQuaternion(rotation);
-            direction.add(target);
-            if (this.points[i][j].distanceTo(direction) < 0.025) {
-              erased = true;
-              break;
-            }
-          }
-          if (erased) {
+          const point = this.points[i][j];
+          const pointIntercept1 = point.y - slope1 * point.z;
+          const pointIntercept2 = point.y - slope2 * point.z;
+          if (
+            (pointIntercept1 <= intercept1
+              ? pointIntercept1 >= intercept2
+              : pointIntercept1 <= intercept2) &&
+            (pointIntercept2 <= intercept3
+              ? pointIntercept2 >= intercept4
+              : pointIntercept2 <= intercept4)
+          ) {
             this.erasePoint(i, j);
             i--;
             break;
