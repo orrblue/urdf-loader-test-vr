@@ -22,7 +22,7 @@ export default class Erasing extends Task {
       color: "blue",
       linewidth: options.lineWidth ?? 5,
     });
-    const pathName = options.path ?? "line";
+    const pathName = options.path ?? "filled";
     task.pathName = pathName;
     task.points = erasePaths[pathName];
     task.lines = [[]];
@@ -261,7 +261,7 @@ export default class Erasing extends Task {
         if (0.99 - direction.x > this.distFromWhiteboard) {
           nearWhiteboard = false;
         }
-        corners.push({ y: direction.y, z: direction.z });
+        corners.push(direction);
       }
     }
 
