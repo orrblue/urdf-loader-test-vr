@@ -15,14 +15,14 @@ export default class Erasing extends Task {
     };
     task.debug = options.debug ?? true;
     task.robotControlled = options.robotControlled ?? true;
-    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.01;
+    task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
     task.stopOnCollision = options.stopOnCollision ?? true;
     task.material = new T.LineBasicMaterial({
       color: "blue",
       linewidth: options.lineWidth ?? 5,
     });
-    const pathName = options.path ?? "filled";
+    const pathName = options.path ?? "line";
     task.pathName = pathName;
     task.points = erasePaths[pathName];
     task.lines = [[]];
@@ -252,7 +252,7 @@ export default class Erasing extends Task {
     const target = new T.Vector3(0.99, position.y, position.z);
 
     let nearWhiteboard = true;
-    let corners;
+    let corners = [];
     for (let x = -0.075; x <= 0.075; x += 0.15) {
       for (let z = -0.025; z <= 0.025; z += 0.05) {
         let direction = new T.Vector3(x, 0, z);
