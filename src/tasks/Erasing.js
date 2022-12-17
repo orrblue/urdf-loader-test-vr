@@ -15,6 +15,7 @@ export default class Erasing extends Task {
     };
     task.debug = options.debug ?? true;
     task.robotControlled = options.robotControlled ?? true;
+    task.setRobot = options.setRobot ?? "";
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
     task.stopOnCollision = options.stopOnCollision ?? true;
@@ -22,7 +23,7 @@ export default class Erasing extends Task {
       color: "blue",
       linewidth: options.lineWidth ?? 5,
     });
-    const pathName = options.path ?? "line";
+    const pathName = options.path ?? "zigzag";
     task.pathName = pathName;
     task.points = erasePaths[pathName];
     task.lines = [[]];
@@ -62,6 +63,11 @@ export default class Erasing extends Task {
       position: new T.Vector3(1, 0, 0),
       rotation: new T.Euler(0, Math.PI, 0, "XYZ"),
     });
+
+    if (this.setRobot != "") {
+      window.setRobot(this.setRobot);
+    }
+
     if (this.robotControlled) {
       window.adjustedControl = (goal) => {
         if (this.stopOnCollision) {
@@ -198,13 +204,23 @@ export default class Erasing extends Task {
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
-      let correctionRot = new T.Quaternion(
-        Math.sin(-Math.PI / 4),
-        0,
-        0,
-        Math.cos(-Math.PI / 4)
-      );
-      ori.multiply(correctionRot);
+      if (window.robotName == "sawyer") {
+        let correctionRot = new T.Quaternion(
+          Math.sin(-Math.PI / 4),
+          0,
+          0,
+          Math.cos(-Math.PI / 4)
+        );
+        ori.multiply(correctionRot);
+      } else {
+        let correctionRot = new T.Quaternion(
+          0,
+          0,
+          Math.sin(Math.PI / 4),
+          Math.cos(-Math.PI / 4)
+        );
+        ori.multiply(correctionRot);
+      }
       let correctionTrans = new T.Vector3(0, -0.15, 0);
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);

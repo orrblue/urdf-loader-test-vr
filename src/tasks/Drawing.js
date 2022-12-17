@@ -15,6 +15,7 @@ export default class Drawing extends Task {
     };
     task.debug = options.debug ?? true;
     task.robotControlled = options.robotControlled ?? true;
+    task.setRobot = options.setRobot ?? "";
     task.adjustedControl = options.adjustedControl ?? false;
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.drawVibrationStrength = options.drawVibrationStrength ?? 0;
@@ -77,6 +78,11 @@ export default class Drawing extends Task {
       position: new T.Vector3(1, 0, 0),
       rotation: new T.Euler(0, Math.PI, 0, "XYZ"),
     });
+
+    if (this.setRobot != "") {
+      window.setRobot(this.setRobot);
+    }
+
     if (this.robotControlled) {
       window.adjustedControl = (goal) => {
         if (this.adjustedControl) {
@@ -238,13 +244,23 @@ export default class Drawing extends Task {
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
-      let correctionRot = new T.Quaternion(
-        Math.sin(-Math.PI / 4),
-        0,
-        0,
-        Math.cos(-Math.PI / 4)
-      );
-      ori.multiply(correctionRot);
+      if (window.robotName == "sawyer") {
+        let correctionRot = new T.Quaternion(
+          Math.sin(-Math.PI / 4),
+          0,
+          0,
+          Math.cos(-Math.PI / 4)
+        );
+        ori.multiply(correctionRot);
+      } else {
+        let correctionRot = new T.Quaternion(
+          0,
+          0,
+          Math.sin(Math.PI / 4),
+          Math.cos(-Math.PI / 4)
+        );
+        ori.multiply(correctionRot);
+      }
       let correctionTrans = new T.Vector3(0, -0.2, 0);
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
