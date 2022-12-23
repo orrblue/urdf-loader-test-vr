@@ -20,7 +20,7 @@ export default class Erasing extends Task {
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
     task.stopOnCollision = options.stopOnCollision ?? true;
     task.material = new T.LineBasicMaterial({
-      color: "blue",
+      color: options.color ?? "blue",
       linewidth: options.lineWidth ?? 5,
     });
     const pathName = options.path ?? "zigzag";
