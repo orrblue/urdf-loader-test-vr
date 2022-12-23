@@ -21,41 +21,68 @@ Note that `npm run build` must be executed everytime changes are made to the cod
 ### Drawing Task
 Draw over an outlined curve on the whiteboard.
 
-*options:*\n
-debug (bool): Indicate to backend that data is for debugging instead of real experiment data\n
-robotControlled (bool): Choose to draw by either holding the marker at the controller poisition or by having the robot hold the marker.\n
-setRobot (str): Name of the robot to set at start of task. If not specified, uses current robot.\n
-adjustedControl (bool): Rotate marker to hold controller differently when controller controlled, or move center of rotation when robot controlled\n
-distFromWhiteboard (float): Distance away from whiteboard for the marker to start drawing\n
-drawVibrationStrength (float): Specifies how much controller vibrates when drawing. default: 0 or no vibration\n
-rotationBased (bool): Choose whether the drawing functionality will involve a projection perpendicular to the whiteboard (false) or parallel to the marker (true).\n
-stopOnCollision (bool): Add fake collision behavior between the marker and the whiteboard.\n
-pointerSize (float): Size of projection pointer. If not specified, there will be no projection pointer.\n
-color (str): Color of drawn lines.\n
-lineWidth (float): Width of drawn lines.\n
-traceName (str): Name of trace to draw over specified in traces.js.\n
-curveScale (float): Amount the trace is scaled by.\n
-distFromCurve (float): Distance from start and end points to be considered for clear condition.\n
+*options:*
+
+debug (bool): Indicate to backend that data is for debugging instead of real experiment data
+
+robotControlled (bool): Choose to draw by either holding the marker at the controller poisition or by having the robot hold the marker.
+
+setRobot (str): Name of the robot to set at start of task. If not specified, uses current robot.
+
+adjustedControl (bool): Rotate marker to hold controller differently when controller controlled, or move center of rotation when robot controlled
+
+distFromWhiteboard (float): Distance away from whiteboard for the marker to start drawing
+
+drawVibrationStrength (float): Specifies how much controller vibrates when drawing. default: 0 or no vibration
+
+rotationBased (bool): Choose whether the drawing functionality will involve a projection perpendicular to the whiteboard (false) or parallel to the marker (true).
+
+stopOnCollision (bool): Add fake collision behavior between the marker and the whiteboard.
+
+pointerSize (float): Size of projection pointer. If not specified, there will be no projection pointer.
+
+color (str): Color of drawn lines.
+
+lineWidth (float): Width of drawn lines.
+
+traceName (str): Name of trace to draw over specified in traces.js.
+
+curveScale (float): Amount the trace is scaled by.
+
+distFromCurve (float): Distance from start and end points to be considered for clear condition.
+
 bufferSize (int): Determines frequency of network requests.
 
 ### Erasing Task
 Erase pre-existing lines on the whiteboard.
 
-*options:*\n
-debug (bool): Indicate to backend that data is for debugging instead of real experiment data\n
-robotControlled (bool): Choose to draw by either holding the marker at the controller poisition or by having the robot hold the marker.\n
-setRobot (str): Name of the robot to set at start of task. If not specified, uses current robot.\n
-distFromWhiteboard (float): Distance away from whiteboard for all corners of eraser to start erasing\n
-eraseVibrationStrength (float): Specifies how much controller vibrates when erasing. default: 0 or no vibration\n
-stopOnCollision (bool): Add fake collision behavior between the eraser and the whiteboard.\n
-color (str): Color of pre-existing lines.\n
-lineWidth (float): Width of pre-existing lines.\n
-pathName (str): Name of line to erase specified in erasePaths.js.\n
+*options:*
+
+debug (bool): Indicate to backend that data is for debugging instead of real experiment data
+
+robotControlled (bool): Choose to draw by either holding the marker at the controller poisition or by having the robot hold the marker.
+
+setRobot (str): Name of the robot to set at start of task. If not specified, uses current robot.
+
+distFromWhiteboard (float): Distance away from whiteboard for all corners of eraser to start erasing
+
+eraseVibrationStrength (float): Specifies how much controller vibrates when erasing. default: 0 or no vibration
+
+stopOnCollision (bool): Add fake collision behavior between the eraser and the whiteboard.
+
+color (str): Color of pre-existing lines.
+
+lineWidth (float): Width of pre-existing lines.
+
+pathName (str): Name of line to erase specified in erasePaths.js.
+
 bufferSize (int): Determines frequency of network requests.
 
 ### window.setRobot(robotName)
-Change the current robot.\n
-robotName = "sawyer" -> set the robot to sawyer\n
+Change the current robot.
+
+robotName = "sawyer" -> set the robot to sawyer
+
 robotName = "ur5" -> set the robot to ur5
 
 ## Design
