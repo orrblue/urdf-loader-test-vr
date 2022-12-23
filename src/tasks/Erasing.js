@@ -170,6 +170,10 @@ export default class Erasing extends Task {
     this.trialCounterText?.set(
       `Trial: ${Number(this.fsm.state) + 1} / ${this.numRounds}`
     );
+
+    if (this.lines.length == 0) {
+      this.fsm.next();
+    }
   }
 
   renderLines() {

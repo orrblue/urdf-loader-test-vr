@@ -113,7 +113,7 @@ function loadRobot(
       console.log("%cSuccessfully loaded robot config.", "color: green");
 
       window.robots[name].linkToRigidBody = new Map();
-      window.robots[name].simObjs = new Map();
+      window.robots[name].robotObjs = new Map();
 
       function initRobotPhysics(currJoint) {
         if (
@@ -154,7 +154,7 @@ function loadRobot(
                 const visualGroup = new T.Group();
                 visualGroup.add(urdfVisual);
                 //scene.add(visualGroup);
-                window.robots[name].simObjs.set(rigidBody, visualGroup);
+                window.robots[name].robotObjs.set(rigidBody, visualGroup);
               }
 
               if (
@@ -270,7 +270,12 @@ function loadRobot(
 }
 
 window.setRobot = (name) => {
-  window.simObjs.forEach((visualGroup, rigidBody) => scene.remove(visualGroup));
+  window.robotObjs.forEach((visualGroup, rigidBody) =>
+    window.simObjs.delete(visualGroup)
+  );
+  window.robotObjs.forEach((visualGroup, rigidBody) =>
+    scene.remove(visualGroup)
+  );
   window.robot = window.robots[name].robot;
   window.robotName = window.robots[name].robotName;
   window.robotColliders = window.robots[name].robotColliders;
@@ -280,10 +285,13 @@ window.setRobot = (name) => {
   window.settings = window.robots[name].settings;
   window.relaxedIK = window.robots[name].relaxedIK;
   window.linkToRigidBody = window.robots[name].linkToRigidBody;
-  window.simObjs = window.robots[name].simObjs;
+  window.robotObjs = window.robots[name].robotObjs;
   window.leftFinger = window.robots[name].leftFinger;
   window.rightFinger = window.robots[name].rightFinger;
-  window.simObjs.forEach((visualGroup, rigidBody) => scene.add(visualGroup));
+  window.robotObjs.forEach((visualGroup, rigidBody) => scene.add(visualGroup));
+  window.robotObjs.forEach((visualGroup, rigidBody) =>
+    window.simObjs.set(rigidBody, visualGroup)
+  );
 };
 
 ///////////////////////////////////////////////////////////
@@ -308,6 +316,7 @@ const ground = world.createCollider(groundColliderDesc, groundRigidBody);
 const groundCollisionGroups = 0x00020001;
 ground.setCollisionGroups(groundCollisionGroups);
 
+window.robotObjs = new Map();
 window.simObjs = new Map();
 window.robots = {};
 

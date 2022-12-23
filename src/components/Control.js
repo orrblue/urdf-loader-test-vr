@@ -90,26 +90,27 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
-      await Erasing.init(
-        utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          robotControlled: true,
-          text: "Erasing Task.\n\n",
-        }
-      ),
       await Drawing.init(
         utilities,
         new Condition("remote-control-only", [
           new RemoteControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
+          setRobot: "ur5",
           rotationBased: true,
           adjustedControl: true,
           trace: "ros",
           text: "Remote Control.\n\n",
+        }
+      ),
+      await Erasing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          setRobot: "sawyer",
+          text: "Erasing Task.\n\n",
         }
       ),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
