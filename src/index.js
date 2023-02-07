@@ -347,7 +347,7 @@ getURDFFromURL(
       robots.sawyer.nn,
       robots.sawyer.settings,
       true,
-      false
+      true
     );
   }
 );
@@ -363,7 +363,7 @@ getURDFFromURL(
       robots.ur5.nn,
       robots.ur5.settings,
       true,
-      true
+      false
     );
   }
 );

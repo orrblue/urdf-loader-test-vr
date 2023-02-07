@@ -84,11 +84,24 @@ export default class Control {
     };
 
     control.tasks = [
-      await DragControlTutorial.init(
+      await RemoteControlTutorial.init(
         utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
+      ),
+      await Drawing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          setRobot: "sawyer",
+          rotationBased: true,
+          trace: "ros",
+          text: "sawyer drawing.\n\n",
+        }
       ),
       await Drawing.init(
         utilities,
@@ -98,9 +111,8 @@ export default class Control {
         {
           setRobot: "ur5",
           rotationBased: true,
-          adjustedControl: true,
           trace: "ros",
-          text: "Remote Control.\n\n",
+          text: "ur5 drawing.\n\n",
         }
       ),
       await Erasing.init(
@@ -110,7 +122,17 @@ export default class Control {
         ]),
         {
           setRobot: "sawyer",
-          text: "Erasing Task.\n\n",
+          text: "sawyer erasing.\n\n",
+        }
+      ),
+      await Erasing.init(
+        utilities,
+        new Condition("remote-control-only", [
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          setRobot: "ur5",
+          text: "ur5 erasing.\n\n",
         }
       ),
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
@@ -130,62 +152,14 @@ export default class Control {
         distFromWhiteboard: 0.025,
         text: "Projection Parallel to Marker.\n\n",
       }),
-      await GraspingTutorial.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ])
-      ),
-      await PickAndDrop.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ]),
-        {
-          numRounds: 2,
-          text: "Use drag control to pick up the blocks and place them in the box. Once every block is in the box, complete the task by closing the lid.\n\n",
-        }
-      ),
-      await Stack.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ]),
-        {
-          numRounds: 2,
-          text: "Use drag control to stack the blocks in any order. To complete the task, make sure the stack does not tip over.\n\n",
-        }
-      ),
-      await RemoteControlTutorial.init(
+      await Erasing.init(
         utilities,
         new Condition("remote-control-only", [
           new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ])
-      ),
-      await PickAndDrop.init(
-        utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ]),
         {
-          numRounds: 2,
-          text: "Use remote control to pick up the blocks and place them in the box. Once every block is in the box, complete the task by closing the lid.\n\n",
-        }
-      ),
-      await Stack.init(
-        utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ]),
-        {
-          numRounds: 2,
-          text: "Use remote control to stack the blocks in any order. To complete the task, make sure the stack does not tip over.\n\n",
+          robotControlled: false,
+          text: "Erasing Task.\n\n",
         }
       ),
       await End.init(
