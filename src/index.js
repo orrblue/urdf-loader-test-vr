@@ -337,7 +337,7 @@ const robots = {
 };
 
 getURDFFromURL(
-  "https://raw.githubusercontent.com/wycongwisc/robot-files/master/sawyer_description/urdf/sawyer_gripper.urdf",
+  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer_description/urdf/sawyer_gripper.urdf",
   (blob) => {
     robots.sawyer.file = URL.createObjectURL(blob);
     loadRobot(
@@ -353,7 +353,7 @@ getURDFFromURL(
 );
 
 getURDFFromURL(
-  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/ur5_description/urdf/ur5_gripper.urdf",
+  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/urdf/ur5_gripper.urdf",
   (blob) => {
     robots.ur5.file = URL.createObjectURL(blob);
     loadRobot(
