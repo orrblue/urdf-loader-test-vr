@@ -26,6 +26,7 @@ import End from "../tasks/End";
 // modules
 import { DragControl } from "../modules/DragControl";
 import { RemoteControl } from "../modules/RemoteControl";
+import { RedirectedControl } from "../modules/RedirectedControl";
 import Grasping from "../modules/Grasping";
 
 // initial position of user after entering VR
@@ -90,6 +91,15 @@ export default class Control {
           new RemoteControl(utilities, { controlMode: "grip-toggle" }),
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
+      ),
+      await PickAndDrop.init(
+        utilities,
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          text: "Redirected Control.\n\n",
+        }
       ),
       await Drawing.init(
         utilities,
