@@ -375,7 +375,7 @@ getURDFFromURL(
 );
 
 getURDFFromURL(
-  "https://raw.githubusercontent.com/yepw/robot_configs/master/motion_viewer/spot_arm/urdf/spot_arm.urdf",
+  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_description/urdf/spot_arm.urdf",
   (blob) => {
     robots.spot.file = URL.createObjectURL(blob);
     loadRobot(
