@@ -87,8 +87,8 @@ export default class Control {
     control.tasks = [
       await RemoteControlTutorial.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
       ),
@@ -103,8 +103,8 @@ export default class Control {
       ),
       await Drawing.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "sawyer",
@@ -115,8 +115,8 @@ export default class Control {
       ),
       await Drawing.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "ur5",
@@ -127,8 +127,8 @@ export default class Control {
       ),
       await Erasing.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "sawyer",
@@ -137,8 +137,8 @@ export default class Control {
       ),
       await Erasing.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "ur5",
@@ -164,8 +164,8 @@ export default class Control {
       }),
       await Erasing.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           robotControlled: false,
@@ -174,8 +174,8 @@ export default class Control {
       ),
       await End.init(
         utilities,
-        new Condition("remote-control-only", [
-          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
     ];

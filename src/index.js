@@ -334,6 +334,12 @@ const robots = {
     settings:
       "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/ur5_env_settings.yaml",
   },
+  spot: {
+    info: "https://raw.githubusercontent.com/yepw/robot_configs/master/info_files/ur5_gripper_info.yaml",
+    nn: "https://raw.githubusercontent.com/yepw/robot_configs/master/collision_nn_rust/ur5_nn.yaml",
+    settings:
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/ur5_env_settings.yaml",
+  },
 };
 
 getURDFFromURL(
@@ -347,7 +353,7 @@ getURDFFromURL(
       robots.sawyer.nn,
       robots.sawyer.settings,
       true,
-      true
+      false
     );
   }
 );
@@ -364,6 +370,22 @@ getURDFFromURL(
       robots.ur5.settings,
       true,
       false
+    );
+  }
+);
+
+getURDFFromURL(
+  "https://raw.githubusercontent.com/yepw/robot_configs/master/motion_viewer/spot_arm/urdf/spot_arm.urdf",
+  (blob) => {
+    robots.spot.file = URL.createObjectURL(blob);
+    loadRobot(
+      "spot",
+      robots.spot.file,
+      robots.spot.info,
+      robots.spot.nn,
+      robots.spot.settings,
+      true,
+      true
     );
   }
 );

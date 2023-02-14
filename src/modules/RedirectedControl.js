@@ -132,15 +132,15 @@ export class RedirectedControl extends Module {
       const factor =
         Math.abs(info.ctrlPose.ori.angleTo(info.prevCtrlPose.ori.clone())) /
         (2 * Math.PI);
-      let controllerPos = info.ctrlPose.ori.clone();
+      let controllerOri = info.ctrlPose.ori.clone();
       let correctionRot = new T.Quaternion(
         0,
         Math.sin(Math.PI / 4),
         0,
         Math.cos(Math.PI / 4)
       );
-      controllerPos.multiply(correctionRot);
-      window.goalEERelThree.ori.slerp(controllerPos, factor);
+      controllerOri.multiply(correctionRot);
+      window.goalEERelThree.ori.slerp(controllerOri, factor);
 
       this.showOffsetIndicator &&
         this.updateOffsetIndicator(
