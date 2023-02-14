@@ -35,10 +35,15 @@ export function getCurrEEPose() {
       posi: window.robot.links.right_hand.getWorldPosition(new T.Vector3()),
       ori: window.robot.links.right_hand.getWorldQuaternion(new T.Quaternion()),
     };
+  } else if (window.robotName == "ur5") {
+    return {
+      posi: window.robot.links.finger_tip.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.finger_tip.getWorldQuaternion(new T.Quaternion()),
+    };
   } else {
     return {
-      posi: window.robot.links.ee_link.getWorldPosition(new T.Vector3()),
-      ori: window.robot.links.ee_link.getWorldQuaternion(new T.Quaternion()),
+      posi: window.robot.links.finger.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.finger.getWorldQuaternion(new T.Quaternion()),
     };
   }
 }
