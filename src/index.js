@@ -250,6 +250,18 @@ function loadRobot(
               });
             }
           });
+        } else if (currJoint.type === "URDFVisual") {
+          let urdfVisual = currJoint;
+
+          urdfVisual.traverse((child) => {
+            child.castShadow = true;
+            child.recieveShadow = true;
+          });
+
+          const visualGroup = new T.Group();
+          visualGroup.add(urdfVisual);
+          //scene.add(visualGroup);
+          window.robots[name].robotObjs.set(rigidBody, visualGroup);
         }
       }
 
