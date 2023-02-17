@@ -34,10 +34,12 @@ function loadRobot(
     loadScreen
       ? new T.LoadingManager(() => {
           const loadingScreen = document.querySelector("#loading-screen");
-          loadingScreen.classList.add("fade-out");
-          loadingScreen.addEventListener("transitionend", (e) =>
-            e.target.remove()
-          );
+          if (loadingScreen) {
+            loadingScreen.classList.add("fade-out");
+            loadingScreen.addEventListener("transitionend", (e) =>
+              e.target.remove()
+            );
+          }
         })
       : null
   );

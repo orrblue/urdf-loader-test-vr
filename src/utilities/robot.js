@@ -42,8 +42,8 @@ export function getCurrEEPose() {
     };
   } else {
     return {
-      posi: window.robot.links.finger.getWorldPosition(new T.Vector3()),
-      ori: window.robot.links.finger.getWorldQuaternion(new T.Quaternion()),
+      posi: window.robot.links.gripper.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.gripper.getWorldQuaternion(new T.Quaternion()),
     };
   }
 }
