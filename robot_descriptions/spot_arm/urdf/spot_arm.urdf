@@ -7,7 +7,7 @@
 <link name="body">
     <visual>
         <geometry>
-            <mesh filename="package://spot_arm/meshes/body.dae" />
+            <mesh filename="package://spot_arm/meshes/body_collision.dae" />
         </geometry>
     </visual>
     <collision>
