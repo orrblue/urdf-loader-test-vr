@@ -9,7 +9,6 @@
         <geometry>
             <mesh filename="package://spot_arm/meshes/body.dae" />
         </geometry>
-        <material name="silver"/>
     </visual>
     <collision>
         <geometry>
