@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 3.1.2 commit date:2022-03-31, commit time:17:40, hash:cc66d1020c3b</authoring_tool>
     </contributor>
-    <created>2023-02-17T15:30:02</created>
-    <modified>2023-02-17T15:30:02</modified>
+    <created>2023-02-17T15:47:10</created>
+    <modified>2023-02-17T15:47:10</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -82,7 +82,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="base_link" name="base_link" type="NODE">
-        <matrix sid="transform">-7.1558e-6 163.7056 2.6671e-5 3.77422e-7 -163.7056 -7.1558e-6 -1.16583e-12 -1.850622 0 -2.6671e-5 163.7056 40.4453 0 0 0 1</matrix>
+        <matrix sid="transform">-7.15555e-8 1.637 2.66701e-7 0 -1.637 -7.15555e-8 -1.16579e-14 0 0 -2.66701e-7 1.637 0.4020029 0 0 0 1</matrix>
         <instance_geometry url="#Spot_robot_002-mesh" name="base_link">
           <bind_material>
             <technique_common>
