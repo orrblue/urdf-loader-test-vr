@@ -7,7 +7,7 @@
 <link name="body">
     <visual>
         <geometry>
-            <mesh filename="package://spot_arm/meshes/body.dae" />
+            <mesh filename="package://spot_arm/meshes/front_left_upper_leg.dae" />
         </geometry>
     </visual>
     <collision>
@@ -323,7 +323,7 @@
     <link name="front_left_upper_leg">
         <visual>
             <geometry>
-                <mesh filename="package://spot_arm/meshes/front_left_upper_leg.dae" />
+                <mesh filename="package://spot_arm/meshes/body.dae" />
             </geometry>
         </visual>
         <collision>
