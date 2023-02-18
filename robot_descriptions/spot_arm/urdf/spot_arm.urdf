@@ -60,14 +60,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.065"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link1.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link1.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="-0.0 -0.0 -0.065"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link1.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link1_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
@@ -91,14 +91,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="-0.015 -0.0 -0.115"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link2.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link2.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="-0.015 -0.0 -0.115"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link2.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link2_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
@@ -123,14 +123,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="-0.017 -0.3125 -0.115"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link3.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link3.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="-0.017 -0.3125 -0.115"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link3.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link3_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
@@ -154,14 +154,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="0.001 -0.4505 -0.0475"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link4.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link4.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0.001 -0.4505 -0.0475"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/link4.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/link4_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
@@ -186,14 +186,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="0.0485 -0.69859 -0.0475"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/wrist.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/wrist.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0.0485 -0.69859 -0.0475"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/wrist.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/wrist_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
@@ -216,14 +216,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="0.0085 -0.77959 -0.0475"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/gripper.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/gripper.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0.0085 -0.77959 -0.0475"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/gripper.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/gripper_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
@@ -245,14 +245,14 @@
   <visual>
     <origin rpy="0 0 0" xyz="0.87709 -0.823505 -0.0185"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/finger.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/finger.dae" scale="0.1 0.1 0.1"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0.87709 -0.823505 -0.0185"/>
     <geometry>
-      <mesh filename="package://spot_arm/meshes/arm/finger.dae" scale="0.001 0.001 0.001"/>
+      <mesh filename="package://spot_arm/meshes/arm/finger_collision.dae" scale="0.1 0.1 0.1"/>
     </geometry>
   </collision>
 </link>
