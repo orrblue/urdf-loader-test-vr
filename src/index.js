@@ -383,7 +383,7 @@ getURDFFromURL(
       robots.ur5.nn,
       robots.ur5.settings,
       true,
-      false
+      true
     );
   }
 );
@@ -399,7 +399,7 @@ getURDFFromURL(
       robots.spot.nn,
       robots.spot.settings,
       true,
-      true
+      false
     );
   }
 );

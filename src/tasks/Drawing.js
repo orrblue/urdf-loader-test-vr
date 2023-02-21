@@ -91,7 +91,12 @@ export default class Drawing extends Task {
           goal.posi.add(direction);
         }
         if (this.stopOnCollision) {
-          let direction = new T.Vector3(0.2, 0, 0);
+          let direction = new T.Vector3(0, 0, 0);
+          if (window.robotName == "sawyer") {
+            direction.x = 0.2;
+          } else {
+            direction.x = 0.1;
+          }
           direction.applyQuaternion(goal.ori);
           goal.posi.add(direction);
           if (goal.posi.x > 0.38) {
@@ -251,12 +256,14 @@ export default class Drawing extends Task {
         Math.cos(-Math.PI / 4)
       );
       ori.multiply(correctionRot);
+      let correctionTrans = new T.Vector3(0, 0, 0);
       if (window.robotName == "sawyer") {
-        let correctionTrans = new T.Vector3(0, -0.2, 0);
-        correctionTrans.applyQuaternion(ori);
-        posi.add(correctionTrans);
+        correctionTrans.y = -0.2;
       } else {
+        correctionTrans.y = -0.05;
       }
+      correctionTrans.applyQuaternion(ori);
+      posi.add(correctionTrans);
     } else {
       pose = this.controller.getPose("right");
       posi.copy(pose.posi);

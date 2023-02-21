@@ -73,7 +73,10 @@ export default class Erasing extends Task {
         if (this.stopOnCollision) {
           for (let y = -0.075; y <= 0.075; y += 0.15) {
             for (let z = -0.025; z <= 0.025; z += 0.05) {
-              let direction = new T.Vector3(0.15, y, z);
+              let direction = new T.Vector3(0, y, z);
+              if (window.robotName == "sawyer") {
+                direction.x = 0.15;
+              }
               direction.applyQuaternion(goal.ori);
               goal.posi.add(direction);
               if (goal.posi.x > 0.4) {
@@ -208,24 +211,17 @@ export default class Erasing extends Task {
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
+      let correctionRot = new T.Quaternion(
+        Math.sin(-Math.PI / 4),
+        0,
+        0,
+        Math.cos(-Math.PI / 4)
+      );
+      ori.multiply(correctionRot);
+      let correctionTrans = new T.Vector3(0, 0, 0);
       if (window.robotName == "sawyer") {
-        let correctionRot = new T.Quaternion(
-          Math.sin(-Math.PI / 4),
-          0,
-          0,
-          Math.cos(-Math.PI / 4)
-        );
-        ori.multiply(correctionRot);
-      } else {
-        let correctionRot = new T.Quaternion(
-          0,
-          0,
-          Math.sin(Math.PI / 4),
-          Math.cos(-Math.PI / 4)
-        );
-        ori.multiply(correctionRot);
+        correctionTrans.y = -0.15;
       }
-      let correctionTrans = new T.Vector3(0, -0.15, 0);
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
     } else {
