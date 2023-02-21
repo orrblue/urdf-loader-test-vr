@@ -25,7 +25,7 @@ export default class Erasing extends Task {
     });
     const pathName = options.path ?? "zigzag";
     task.pathName = pathName;
-    task.points = erasePaths[pathName];
+    task.points = JSON.parse(JSON.stringify(erasePaths[pathName]));
     task.lines = [[]];
     task.id = new Date().getTime();
     task.buffer = [];
