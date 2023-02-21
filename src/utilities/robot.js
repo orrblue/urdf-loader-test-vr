@@ -25,7 +25,9 @@ export function computeGripper(eePose) {
     new T.Quaternion(eePose.ori.x, eePose.ori.y, eePose.ori.z, eePose.ori.w)
   );
   gripper.quaternion.multiply(EE_TO_THREE_ROT_OFFSET);
-  gripper.translateX(EE_TO_GRIPPER_OFFSET); // get tip of the gripper
+  if (window.robotName == "sawyer") {
+    gripper.translateX(EE_TO_GRIPPER_OFFSET);
+  }
   return gripper;
 }
 
