@@ -60,7 +60,7 @@ export default class Drawing extends Task {
       backgroundOpacity: 0,
     });
     this.instructions.appendChild(
-      this.ui.createText("Whiteboard Drawing\n", { fontSize: 0.08 })
+      this.ui.createText("Drawing Task\n", { fontSize: 0.08 })
     );
     this.instructions.appendChild(
       this.ui.createText(

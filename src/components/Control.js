@@ -21,6 +21,7 @@ import PickAndDrop from "../tasks/PickAndDrop";
 import Stack from "../tasks/Stack";
 import Drawing from "../tasks/Drawing";
 import Erasing from "../tasks/Erasing";
+import Pouring from "../tasks/Pouring";
 import End from "../tasks/End";
 
 // modules
@@ -92,7 +93,7 @@ export default class Control {
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
       ),
-      await PickAndDrop.init(
+      await Pouring.init(
         utilities,
         new Condition("redirected-control-only", [
           new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
@@ -108,11 +109,11 @@ export default class Control {
         ]),
         {
           setRobot: "sawyer",
-          rotationBased: true,
           trace: "ros",
           text: "sawyer drawing.\n\n",
         }
       ),
+      /*
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
@@ -120,11 +121,11 @@ export default class Control {
         ]),
         {
           setRobot: "ur5",
-          rotationBased: true,
           trace: "ros",
           text: "ur5 drawing.\n\n",
         }
       ),
+      */
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
@@ -135,6 +136,7 @@ export default class Control {
           text: "sawyer erasing.\n\n",
         }
       ),
+      /*
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
@@ -145,8 +147,10 @@ export default class Control {
           text: "ur5 erasing.\n\n",
         }
       ),
+      */
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
         robotControlled: false,
+        rotationBased: false,
         trace: "lab",
         curveScale: 0.75,
         pointerSize: 0.001,

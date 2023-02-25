@@ -45,7 +45,7 @@ export default class Erasing extends Task {
       backgroundOpacity: 0,
     });
     this.instructions.appendChild(
-      this.ui.createText("Whiteboard Erasing\n", { fontSize: 0.08 })
+      this.ui.createText("Erasing Task\n", { fontSize: 0.08 })
     );
     this.instructions.appendChild(
       this.ui.createText(

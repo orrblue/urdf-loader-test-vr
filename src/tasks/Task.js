@@ -156,7 +156,6 @@ export default class Task {
    * @param {number} index
    */
   setRound(index) {
-    console.log(index, this.rounds.length);
     this.rounds[index >= this.rounds.length ? 0 : index]();
   }
 
