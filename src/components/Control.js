@@ -237,9 +237,17 @@ export default class Control {
       control.fsm.start();
     });
 
-    // use the trigger on the left controller to continue to the next trial
+    // use the trigger on the left controller to reset the current trial
     control.controller.controller[0].controller.addEventListener(
       "select",
+      () => {
+        control.tasks[Number(control.fsm.state)].fsm.reset();
+      }
+    );
+
+    // use the gripper on the left controller to continue to the next trial
+    control.controller.controller[0].controller.addEventListener(
+      "squeeze",
       () => {
         control.tasks[Number(control.fsm.state)].fsm.next();
       }
