@@ -1,21 +1,22 @@
 import * as T from "three";
 import Task from "./Task";
-import Block from "../objects/Block";
 import Table from "../objects/Table";
 import Box from "../objects/Box";
 import Cup from "../objects/Cup";
 import { computeGripper } from "../utilities/robot";
-import { getCurrEEPose } from "../utilities/robot";
+import WaterParticle from "../objects/WaterParticle";
 
 export default class Pouring extends Task {
   static async init(params, condition, options = {}) {
     const task = new Pouring(params, condition, options);
+    const numParticles = options.numParticles ?? 10;
+    task.numParticles = numParticles;
+    let particles = [];
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(await WaterParticle.init(params));
+    }
     task.objects = {
-      blocks: [
-        await Block.init(params),
-        await Block.init(params),
-        await Block.init(params),
-      ],
+      particles: particles,
       cup: await Cup.init(params),
       box: await Box.init(params),
       table: await Table.init(params),
@@ -26,11 +27,17 @@ export default class Pouring extends Task {
   constructor(params, condition, options) {
     super("pouring", params, condition, options, [
       () => {
-        this.objects.cup.set({ position: new T.Vector3(0.8, 2, 0.5) });
-        this.objects.blocks[0].set({ position: new T.Vector3(0.75, 3, 0.5) });
-        this.objects.blocks[1].set({ position: new T.Vector3(0.85, 4, 0.5) });
-        this.objects.blocks[2].set({ position: new T.Vector3(0.8, 5, 0.5) });
-        this.objects.box.set({ position: new T.Vector3(0.8, 3, -0.5) });
+        this.objects.cup.set({ position: new T.Vector3(0.8, 1, 0.5) });
+        for (let i = 0; i < this.objects.particles.length; i++) {
+          this.objects.particles[i].set({
+            position: new T.Vector3(
+              0.795 + Math.random() * 0.01,
+              2 + i * 0.25,
+              0.495 + Math.random() * 0.01
+            ),
+          });
+        }
+        this.objects.box.set({ position: new T.Vector3(0.8, 1, -0.5) });
       },
     ]);
   }
@@ -52,19 +59,19 @@ export default class Pouring extends Task {
       )
     );
 
-    this.blockCounter = this.ui.createContainer("block-counter", {
+    this.particleCounter = this.ui.createContainer("particle-counter", {
       height: 0.1,
       width: 0.2,
       backgroundOpacity: 0,
     });
-    this.blockCounterText = this.ui.createText("- / -", { fontSize: 0.025 });
-    this.blockCounter.appendChild(this.blockCounterText);
+    this.particleCounterText = this.ui.createText("- / -", { fontSize: 0.025 });
+    this.particleCounter.appendChild(this.particleCounterText);
 
     this.trialCounterText = this.ui.createText("Trial: - / -");
     this.instructions.appendChild(this.trialCounterText);
 
     this.instructions.show();
-    this.blockCounter.show();
+    this.particleCounter.show();
     this.objects.table.set({
       position: new T.Vector3(0.8, 0, 0),
       rotation: new T.Euler(0, -Math.PI / 2, 0, "XYZ"),
@@ -73,22 +80,21 @@ export default class Pouring extends Task {
 
   onStop() {
     this.instructions.hide();
-    this.blockCounter.hide();
+    this.particleCounter.hide();
   }
 
   onUpdate(t, info) {
-    const blocks = this.objects.blocks;
+    const particles = this.objects.particles;
     const table = this.objects.table;
     const box = this.objects.box;
     const cup = this.objects.cup;
     const gripper = computeGripper(info.currEEAbsThree);
 
-    for (const block of blocks) block.update(this.world, gripper);
     cup.update(this.world, gripper);
 
     table.update(this.world, this.controller);
 
-    // ~ go to the next trial if the box or any block hits the ground ~
+    // ~ go to the next trial if the box or cup hits the ground ~
 
     this.world.contactsWith(this.ground, (c) => {
       for (const object of [box, cup]) {
@@ -99,7 +105,7 @@ export default class Pouring extends Task {
       }
     });
 
-    // ~ count how many blocks are in the box ~
+    // ~ count how many particles are in the box ~
     // https://math.stackexchange.com/questions/1472049/check-if-a-point-is-inside-a-rectangular-shaped-area-3d
 
     const p1 = box.meshes[0].position;
@@ -114,9 +120,9 @@ export default class Pouring extends Task {
 
     let numInside = 0;
 
-    for (const block of blocks) {
+    for (const particle of particles) {
       const v = new T.Vector3();
-      v.subVectors(block.meshes[0].position, p1);
+      v.subVectors(particle.meshes[0].position, p1);
       if (
         0 < v.dot(i) &&
         v.dot(i) < i.dot(i) &&
@@ -129,39 +135,35 @@ export default class Pouring extends Task {
       }
     }
 
-    // ~ check if box is closed if all blocks are in the box ~
+    let numContacts = 0;
+    const lid = box.colliders[5];
+    for (const i of [1, 2, 3, 4]) {
+      this.world.contactsWith(box.colliders[i], (collider) => {
+        if (collider === lid) numContacts++;
+      });
+    }
 
-    if (numInside === blocks.length) {
-      let numContacts = 0;
-      const lid = box.colliders[5];
-      for (const i of [1, 2, 3, 4]) {
-        this.world.contactsWith(box.colliders[i], (collider) => {
-          if (collider === lid) numContacts++;
-        });
-      }
-
-      // lid must contact all four sides of the box
-      if (numContacts === 4) {
-        this.fsm.next();
-      }
+    // lid must contact all four sides of the box
+    if (numContacts === 4) {
+      this.fsm.next();
     }
 
     // ~ update ui elements ~
 
     this.instructions?.getObject().lookAt(this.camera.position);
-    this.blockCounter?.getObject().lookAt(this.camera.position);
+    this.particleCounter?.getObject().lookAt(this.camera.position);
 
-    // position block counter above the center of the box
+    // position particle counter above the center of the box
     const temp = box.meshes[0].clone();
     temp.translateX(box.size.x / 2);
     temp.translateY(box.size.z / 2);
     temp.translateZ(-0.05);
 
-    this.blockCounter?.getObject().position.copy(temp.position);
+    this.particleCounter?.getObject().position.copy(temp.position);
 
     this.trialCounterText?.set(
       `Trial: ${Number(this.fsm.state) + 1} / ${this.numRounds}`
     );
-    this.blockCounterText?.set(`${numInside} / ${blocks.length}`);
+    this.particleCounterText?.set(`${numInside} / ${particles.length}`);
   }
 }
