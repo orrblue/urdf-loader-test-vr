@@ -90,17 +90,7 @@ export default class Control {
         utilities,
         new Condition("redirected-control-only", [
           new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
-      ),
-      await Pouring.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          text: "Redirected Control.\n\n",
-        }
       ),
       await Drawing.init(
         utilities,
@@ -110,7 +100,7 @@ export default class Control {
         {
           setRobot: "sawyer",
           trace: "ros",
-          text: "sawyer drawing.\n\n",
+          text: "Sawyer Drawing.\n\n",
         }
       ),
       /*
@@ -133,7 +123,7 @@ export default class Control {
         ]),
         {
           setRobot: "sawyer",
-          text: "sawyer erasing.\n\n",
+          text: "Sawyer Erasing.\n\n",
         }
       ),
       /*
@@ -149,22 +139,13 @@ export default class Control {
       ),
       */
       await Drawing.init(utilities, new Condition("drag-control-only", []), {
-        robotControlled: false,
-        rotationBased: false,
+        robotControl: false,
+        rotationBased: true,
         trace: "lab",
         curveScale: 0.75,
         pointerSize: 0.001,
         distFromWhiteboard: 0.025,
-        text: "Projection Perpendicular to Whiteboard.\n\n",
-      }),
-      await Drawing.init(utilities, new Condition("drag-control-only", []), {
-        robotControlled: false,
-        adjustedControl: true,
-        trace: "hri",
-        curveScale: 0.75,
-        pointerSize: 0.001,
-        distFromWhiteboard: 0.025,
-        text: "Projection Parallel to Marker.\n\n",
+        text: "Hand Drawing.\n\n",
       }),
       await Erasing.init(
         utilities,
@@ -172,8 +153,24 @@ export default class Control {
           new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
-          robotControlled: false,
-          text: "Erasing Task.\n\n",
+          robotControl: false,
+          text: "Hand Erasing.\n\n",
+        }
+      ),
+      await GraspingTutorial.init(
+        utilities,
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new Grasping(utilities, { controlMode: "trigger-toggle" }),
+        ])
+      ),
+      await Pouring.init(
+        utilities,
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+        ]),
+        {
+          text: "Pouring Task.\n\n",
         }
       ),
       await End.init(

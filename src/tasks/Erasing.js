@@ -14,7 +14,7 @@ export default class Erasing extends Task {
       eraser: await Eraser.init(params),
     };
     task.debug = options.debug ?? true;
-    task.robotControlled = options.robotControlled ?? true;
+    task.robotControl = options.robotControl ?? true;
     task.setRobot = options.setRobot ?? "";
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
@@ -68,7 +68,7 @@ export default class Erasing extends Task {
       window.setRobot(this.setRobot);
     }
 
-    if (this.robotControlled) {
+    if (this.robotControl) {
       window.adjustedControl = (goal) => {
         if (this.stopOnCollision) {
           for (let y = -0.075; y <= 0.075; y += 0.15) {
@@ -95,10 +95,12 @@ export default class Erasing extends Task {
       });
     }
 
+    window.eraser = this.objects.eraser;
+
     const data = {
       id: this.id,
       debug: this.debug,
-      robotControlled: this.robotControlled,
+      robotControlled: this.robotControl,
       distFromWhiteboard: this.distFromWhiteboard,
       eraseVibrationStrength: this.eraseVibrationStrength,
       stopOnCollision: this.stopOnCollision,
@@ -135,6 +137,8 @@ export default class Erasing extends Task {
     this.controller.get().grip.traverse((child) => {
       if (child instanceof T.Mesh) child.visible = true;
     });
+
+    window.eraser = null;
 
     this.updateRequest(true);
     /*
@@ -207,7 +211,7 @@ export default class Erasing extends Task {
     let pose;
     let posi = new T.Vector3();
     let ori = new T.Quaternion();
-    if (this.robotControlled) {
+    if (this.robotControl) {
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);

@@ -14,7 +14,7 @@ export default class Drawing extends Task {
       marker: await Marker.init(params),
     };
     task.debug = options.debug ?? true;
-    task.robotControlled = options.robotControlled ?? true;
+    task.robotControl = options.robotControl ?? true;
     task.setRobot = options.setRobot ?? "";
     task.adjustedControl = options.adjustedControl ?? false;
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
@@ -83,7 +83,7 @@ export default class Drawing extends Task {
       window.setRobot(this.setRobot);
     }
 
-    if (this.robotControlled) {
+    if (this.robotControl) {
       window.adjustedControl = (goal) => {
         if (this.adjustedControl) {
           let direction = new T.Vector3(-0.1, 0, 0);
@@ -150,10 +150,12 @@ export default class Drawing extends Task {
       window.scene.add(this.endMesh);
     }
 
+    window.marker = this.objects.marker;
+
     const data = {
       id: this.id,
       debug: this.debug,
-      robotControlled: this.robotControlled,
+      robotControlled: this.robotControl,
       adjustedControl: this.adjustedControl,
       distFromWhiteboard: this.distFromWhiteboard,
       drawVibrationStrength: this.drawVibrationStrength,
@@ -205,6 +207,8 @@ export default class Drawing extends Task {
       window.scene.remove(this.endMesh);
     }
 
+    window.marker = null;
+
     this.updateRequest(true);
     const data = {
       id: this.id,
@@ -245,7 +249,7 @@ export default class Drawing extends Task {
     let pose;
     let posi = new T.Vector3();
     let ori = new T.Quaternion();
-    if (this.robotControlled) {
+    if (this.robotControl) {
       pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);

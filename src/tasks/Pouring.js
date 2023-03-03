@@ -32,7 +32,7 @@ export default class Pouring extends Task {
           this.objects.particles[i].set({
             position: new T.Vector3(
               0.795 + Math.random() * 0.01,
-              2 + i * 0.25,
+              1.1 + i * 0.1,
               0.495 + Math.random() * 0.01
             ),
           });

@@ -14,6 +14,7 @@ export class RedirectedControl extends Module {
     // ========== options ==========
     this.showOffsetIndicator = options.showOffsetIndicator ?? true;
     this.controlMode = options.controlMode ?? "grip-toggle";
+    this.robotControl = options.robotControl ?? true;
     // =============================
 
     this.click = new Audio("./assets/click.wav");
@@ -148,7 +149,9 @@ export class RedirectedControl extends Module {
           window.targetCursor.position
         );
       updateTargetCursor(window.goalEERelThree);
-      updateRobot(window.goalEERelThree);
+      if (this.robotControl) {
+        updateRobot(window.goalEERelThree);
+      }
     }
   }
 

@@ -343,8 +343,8 @@ const robots = {
       "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/sawyer_env_settings.yaml",
   },
   ur5: {
-    info: "https://raw.githubusercontent.com/yepw/robot_configs/master/info_files/ur5_gripper_info.yaml",
-    nn: "https://raw.githubusercontent.com/yepw/robot_configs/master/collision_nn_rust/ur5_nn.yaml",
+    info: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/info_files/sawyer_info.yaml",
+    nn: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/collision_nn_rust/sawyer_nn.yaml",
     settings:
       "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/ur5_env_settings.yaml",
   },
@@ -371,7 +371,7 @@ getURDFFromURL(
     );
   }
 );
-/*
+
 getURDFFromURL(
   "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/urdf/ur5_gripper.urdf",
   (blob) => {
@@ -387,7 +387,7 @@ getURDFFromURL(
     );
   }
 );
-*/
+
 getURDFFromURL(
   "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/urdf/spot_arm.urdf",
   (blob) => {
