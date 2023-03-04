@@ -10,7 +10,7 @@ export default class WaterParticle extends SceneObject {
     super("water_particle", params);
     this.initPosition = options.position ?? new T.Vector3();
     this.initRotation = options.rotation ?? new T.Euler();
-    this.initScale = options.scale ?? new T.Vector3(0.2, 0.2, 0.2);
+    this.initScale = options.scale ?? new T.Vector3(0.15, 0.15, 0.15);
     this.loaded = false;
   }
 

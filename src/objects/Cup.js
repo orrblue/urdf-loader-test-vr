@@ -22,7 +22,7 @@ export default class Cup extends SceneObject {
       0.1 * this.initScale.y,
       0.1 * this.initScale.z
     );
-    this.thickness = 0.01;
+    this.thickness = 0.025;
   }
 
   static async init(params) {
@@ -78,9 +78,9 @@ export default class Cup extends SceneObject {
     const colliderDescs = [
       // bottom
       RAPIER.ColliderDesc.cuboid(
-        this.size.x / 2,
+        (1.1 * this.size.x) / 2,
         this.thickness / 2,
-        this.size.z / 2
+        (1.1 * this.size.z) / 2
       ).setTranslation(0, -this.size.y / 2, 0),
       // sides
       RAPIER.ColliderDesc.cuboid(

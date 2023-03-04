@@ -9,7 +9,7 @@ import WaterParticle from "../objects/WaterParticle";
 export default class Pouring extends Task {
   static async init(params, condition, options = {}) {
     const task = new Pouring(params, condition, options);
-    const numParticles = options.numParticles ?? 10;
+    const numParticles = options.numParticles ?? 30;
     task.numParticles = numParticles;
     let particles = [];
     for (let i = 0; i < numParticles; i++) {
@@ -32,7 +32,7 @@ export default class Pouring extends Task {
           this.objects.particles[i].set({
             position: new T.Vector3(
               0.795 + Math.random() * 0.01,
-              1.1 + i * 0.1,
+              1.05 + i * 0.05,
               0.495 + Math.random() * 0.01
             ),
           });
