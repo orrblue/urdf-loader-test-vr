@@ -5,7 +5,7 @@ import * as yaml from "js-yaml";
 import { getURDFFromURL } from "./utilities/loaders";
 import initRelaxedIK, {
   RelaxedIK,
-} from "../relaxed_ik_web/pkg/relaxed_ik_web.js";
+} from "../relaxed_ik_core/pkg/relaxed_ik_core.js";
 import ThreeMeshUI from "three-mesh-ui";
 import Control from "./components/Control.js";
 import { Data } from "./components/Data";
@@ -17,16 +17,15 @@ import RAPIER from "@dimforge/rapier3d";
  * Adds the robot to the scene, sets initial joint values, and initializes RelaxedIK
  *
  * @param {String} file
- * @param {String} info
- * @param {String} nn
+ * @param {String} config_link
+ * @param {String} urdf_link
  * @param {Boolean} loadScreen
  */
 function loadRobot(
   name,
   file,
-  info,
-  nn,
-  settings,
+  config_link,
+  urdf_link,
   loadScreen = false,
   init = false
 ) {
@@ -82,14 +81,11 @@ function loadRobot(
     window.robots[name].gripperColliders = [];
 
     initRelaxedIK().then(async () => {
-      window.robots[name].robotInfo = yaml.load(
-        await fetch(info).then((response) => response.text())
+      window.robots[name].configs = yaml.load(
+        await fetch(config_link).then((response) => response.text())
       );
-      window.robots[name].robotNN = yaml.load(
-        await fetch(nn).then((response) => response.text())
-      );
-      window.robots[name].settings = yaml.load(
-        await fetch(settings).then((response) => response.text())
+      window.robots[name].urdf = await fetch(urdf_link).then((response) =>
+        response.text()
       );
 
       const joints = Object.entries(window.robots[name].robot.joints).filter(
@@ -97,20 +93,19 @@ function loadRobot(
           joint[1]._jointType != "fixed" && joint[1].type != "URDFMimicJoint"
       );
       joints.forEach((joint) => {
-        const jointIndex = window.robots[name].robotInfo.joint_ordering.indexOf(
+        const jointIndex = window.robots[name].configs.joint_ordering.indexOf(
           joint[0]
         );
         if (jointIndex != -1)
           window.robots[name].robot.setJointValue(
             joint[0],
-            window.robots[name].robotInfo.starting_config[jointIndex]
+            window.robots[name].configs.starting_config[jointIndex]
           );
       });
 
       window.robots[name].relaxedIK = new RelaxedIK(
-        window.robots[name].robotInfo,
-        window.robots[name].robotNN,
-        window.robots[name].settings
+        window.robots[name].configs,
+        window.robots[name].urdf
       );
       console.log("%cSuccessfully loaded robot config.", "color: green");
 
@@ -294,9 +289,7 @@ window.setRobot = (name) => {
   window.robotName = window.robots[name].robotName;
   window.robotColliders = window.robots[name].robotColliders;
   window.gripperColliders = window.robots[name].gripperColliders;
-  window.robotInfo = window.robots[name].robotInfo;
-  window.robotNN = window.robots[name].robotNN;
-  window.settings = window.robots[name].settings;
+  window.robotConfigs = window.robots[name].configs;
   window.relaxedIK = window.robots[name].relaxedIK;
   window.linkToRigidBody = window.robots[name].linkToRigidBody;
   window.robotObjs = window.robots[name].robotObjs;
@@ -337,72 +330,57 @@ window.robots = {};
 // load robot
 const robots = {
   sawyer: {
-    info: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/info_files/sawyer_info.yaml",
-    nn: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/collision_nn_rust/sawyer_nn.yaml",
-    settings:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/sawyer_env_settings.yaml",
+    config:
+      "https://raw.githubusercontent.com/yepw/robot_configs/master/relaxed_ik_web_demo/settings/sawyer.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer_description/urdf/sawyer_gripper.urdf",
   },
   ur5: {
-    info: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/info_files/sawyer_info.yaml",
-    nn: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/collision_nn_rust/sawyer_nn.yaml",
-    settings:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/ur5_env_settings.yaml",
+    config:
+      "https://raw.githubusercontent.com/yepw/robot_configs/master/relaxed_ik_web_demo/settings/ur5.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/urdf/ur5_gripper.urdf",
   },
   spot: {
-    info: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/info_files/sawyer_info.yaml",
-    nn: "https://raw.githubusercontent.com/uwgraphics/relaxed_ik_core/collision-ik/config/collision_nn_rust/sawyer_nn.yaml",
-    settings:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/relaxed_ik_web/ur5_env_settings.yaml",
+    config:
+      "https://raw.githubusercontent.com/yepw/robot_configs/master/relaxed_ik_web_demo/settings/spot_arm.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/urdf/spot_arm.urdf",
   },
 };
 
-getURDFFromURL(
-  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer_description/urdf/sawyer_gripper.urdf",
-  (blob) => {
-    robots.sawyer.file = URL.createObjectURL(blob);
-    loadRobot(
-      "sawyer",
-      robots.sawyer.file,
-      robots.sawyer.info,
-      robots.sawyer.nn,
-      robots.sawyer.settings,
-      true,
-      true
-    );
-  }
-);
+getURDFFromURL(robots.sawyer.urdf, (blob) => {
+  robots.sawyer.file = URL.createObjectURL(blob);
+  loadRobot(
+    "sawyer",
+    robots.sawyer.file,
+    robots.sawyer.config,
+    robots.sawyer.urdf,
+    true,
+    true
+  );
+});
 
-getURDFFromURL(
-  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/urdf/ur5_gripper.urdf",
-  (blob) => {
-    robots.ur5.file = URL.createObjectURL(blob);
-    loadRobot(
-      "ur5",
-      robots.ur5.file,
-      robots.ur5.info,
-      robots.ur5.nn,
-      robots.ur5.settings,
-      true,
-      false
-    );
-  }
-);
+getURDFFromURL(robots.ur5.urdf, (blob) => {
+  robots.ur5.file = URL.createObjectURL(blob);
+  loadRobot(
+    "ur5",
+    robots.ur5.file,
+    robots.ur5.config,
+    robots.ur5.urdf,
+    true,
+    false
+  );
+});
 
-getURDFFromURL(
-  "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/urdf/spot_arm.urdf",
-  (blob) => {
-    robots.spot.file = URL.createObjectURL(blob);
-    loadRobot(
-      "spot",
-      robots.spot.file,
-      robots.spot.info,
-      robots.spot.nn,
-      robots.spot.settings,
-      true,
-      false
-    );
-  }
-);
+getURDFFromURL(robots.spot.urdf, (blob) => {
+  robots.spot.file = URL.createObjectURL(blob);
+  loadRobot(
+    "spot",
+    robots.spot.file,
+    robots.spot.config,
+    robots.spot.urdf,
+    true,
+    false
+  );
+});
 
 async function someInit(name) {
   window.setRobot(name);

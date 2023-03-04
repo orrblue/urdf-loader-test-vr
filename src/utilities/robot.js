@@ -93,7 +93,7 @@ export function updateRobot() {
         joint[1]._jointType != "fixed" && joint[1].type != "URDFMimicJoint"
     );
     joints.forEach((joint) => {
-      const jointIndex = window.robotInfo.joint_ordering.indexOf(joint[0]);
+      const jointIndex = window.robotConfigs.joint_ordering.indexOf(joint[0]);
       if (jointIndex != -1)
         window.robot.setJointValue(joint[0], result[jointIndex]);
     });
@@ -116,7 +116,7 @@ export function resetRobot() {
     posi: new T.Vector3(),
     ori: new T.Quaternion().identity(),
   };
-  window.relaxedIK.recover_vars([]);
+  window.relaxedIK.reset();
   updateRobot();
   updateTargetCursor();
 }

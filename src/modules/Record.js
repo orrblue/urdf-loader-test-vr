@@ -16,13 +16,13 @@
 //         const playbackIndicator = new T.Mesh(new T.SphereGeometry(0.05, 32, 32 ), new T.MeshBasicMaterial({ color: 0x0000FF }));
 //         playbackIndicator.position.set(0, 1.65, 0);
 
-//         let playbackInterval, recordInterval; 
+//         let playbackInterval, recordInterval;
 
 //         this.isRecording = false;
 //         this.data = []
 //         this.frameIndex = 0;
 
-//         // state machine additions 
+//         // state machine additions
 
 //         fsmConfig.transitions.push({ name: 'activatePlayback', from: 'IDLE', to: 'PLAYBACK' });
 //         fsmConfig.transitions.push({ name: 'deactivatePlayback', from: 'PLAYBACK', to: 'IDLE'});
@@ -83,7 +83,7 @@
 //         //     ]
 //         // )
 
-//         // REMOVE THIS 
+//         // REMOVE THIS
 //         localStorage.clear();
 //     }
 
@@ -93,7 +93,7 @@
 //             joints.forEach((joint, index) => {
 //                 const jointData = this.data[this.frameIndex].find((e) => e[0] === index);
 //                 if (jointData) window.robot.setJointValue(joint[0],  jointData[1]);
-//             })   
+//             })
 //             if (this.frameIndex < this.data.length - 1) {
 //                 this.frameIndex++;
 //             } else {
@@ -107,9 +107,9 @@
 //             const row = [];
 //             const joints = Object.entries(window.robot.joints).filter(joint => joint[1]._jointType != "fixed" && joint[1].type != "URDFMimicJoint");
 //             joints.forEach((joint, index) => {
-//                 let jointIndex = window.robotInfo.joint_ordering.indexOf(joint[0]);
+//                 let jointIndex = window.robotConfigs.joint_ordering.indexOf(joint[0]);
 //                 if (jointIndex != -1) row.push([index, joint[1].jointValue[0]])
-//             }) 
+//             })
 //             this.data.push(row);
 //             return false;
 //         }

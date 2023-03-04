@@ -289,29 +289,7 @@ export default class Task {
       },
     ];
 
-    let jointNames;
-    if (window.robotName == "sawyer") {
-      jointNames = [
-        "right_j0",
-        "right_j1",
-        "right_j2",
-        "right_j3",
-        "right_j4",
-        "right_j5",
-        "right_j6",
-      ];
-    } else {
-      jointNames = [
-        "shoulder_pan_joint",
-        "shoulder_lift_joint",
-        "elbow_joint",
-        "wrist_1_joint",
-        "wrist_2_joint",
-        "wrist_3_joint",
-      ];
-    }
-
-    for (const joint of jointNames) {
+    for (const joint of window.robotConfigs.joint_ordering) {
       state[4].joints.push({
         name: joint,
         angle: robot.joints[joint].jointValue[0],
