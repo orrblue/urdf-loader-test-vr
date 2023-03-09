@@ -138,19 +138,31 @@ export default class Control {
         }
       ),
       */
-      await Drawing.init(utilities, new Condition("drag-control-only", []), {
-        robotControl: false,
-        rotationBased: true,
-        trace: "lab",
-        curveScale: 0.75,
-        pointerSize: 0.001,
-        distFromWhiteboard: 0.025,
-        text: "Hand Drawing.\n\n",
-      }),
+      await Drawing.init(
+        utilities,
+        new Condition("redirected-control-only", [
+          new RedirectedControl(utilities, {
+            controlMode: "grip-toggle",
+            showOffsetIndicator: false,
+          }),
+        ]),
+        {
+          robotControl: false,
+          rotationBased: true,
+          trace: "lab",
+          curveScale: 0.75,
+          pointerSize: 0.001,
+          distFromWhiteboard: 0.025,
+          text: "Hand Drawing.\n\n",
+        }
+      ),
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new RedirectedControl(utilities, {
+            controlMode: "grip-toggle",
+            showOffsetIndicator: false,
+          }),
         ]),
         {
           robotControl: false,

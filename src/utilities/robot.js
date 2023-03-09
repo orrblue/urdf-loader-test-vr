@@ -116,7 +116,7 @@ export function resetRobot() {
     posi: new T.Vector3(),
     ori: new T.Quaternion().identity(),
   };
-  window.relaxedIK.reset();
+  window.relaxedIK.reset([]);
   updateRobot();
   updateTargetCursor();
 }

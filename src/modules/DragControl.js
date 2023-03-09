@@ -15,7 +15,6 @@ export class DragControl extends Module {
     this.activationRadius = options.activationRadius ?? 0.1;
     this.showOffsetIndicator = options.showOffsetIndicator ?? true;
     this.controlMode = options.controlMode ?? "grip-auto";
-    this.robotControl = options.robotControl ?? true;
     // =============================
   }
 
@@ -189,9 +188,7 @@ export class DragControl extends Module {
           window.targetCursor.position
         );
       updateTargetCursor(window.goalEERelThree);
-      if (this.robotControl) {
-        updateRobot(window.goalEERelThree);
-      }
+      updateRobot(window.goalEERelThree);
     }
   }
 

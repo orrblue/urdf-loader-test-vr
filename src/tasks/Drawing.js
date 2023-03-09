@@ -108,9 +108,9 @@ export default class Drawing extends Task {
         return goal;
       };
     } else {
-      this.controller.get().grip.traverse((child) => {
-        if (child instanceof T.Mesh) child.visible = false;
-      });
+      window.robotObjs.forEach(
+        (visualGroup, rigidBody) => (visualGroup.visible = false)
+      );
     }
 
     if (this.pointerSize != 0) {
@@ -149,8 +149,6 @@ export default class Drawing extends Task {
       this.endMesh.position.copy(this.traceEnd);
       window.scene.add(this.endMesh);
     }
-
-    window.marker = this.objects.marker;
 
     const data = {
       id: this.id,
@@ -193,9 +191,9 @@ export default class Drawing extends Task {
       return goal;
     };
 
-    this.controller.get().grip.traverse((child) => {
-      if (child instanceof T.Mesh) child.visible = true;
-    });
+    window.robotObjs.forEach(
+      (visualGroup, rigidBody) => (visualGroup.visible = true)
+    );
 
     if (this.pointerSize != 0) {
       window.scene.remove(this.pointer);
@@ -206,8 +204,6 @@ export default class Drawing extends Task {
       window.scene.remove(this.startMesh);
       window.scene.remove(this.endMesh);
     }
-
-    window.marker = null;
 
     this.updateRequest(true);
     const data = {
@@ -246,11 +242,10 @@ export default class Drawing extends Task {
   }
 
   updateMarker() {
-    let pose;
     let posi = new T.Vector3();
     let ori = new T.Quaternion();
     if (this.robotControl) {
-      pose = getCurrEEPose();
+      let pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
       let correctionRot = new T.Quaternion(
@@ -269,15 +264,23 @@ export default class Drawing extends Task {
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
     } else {
-      pose = this.controller.getPose("right");
-      posi.copy(pose.posi);
-      ori.copy(pose.ori);
+      let pose = window.targetCursor;
+      posi.copy(pose.position);
+      ori.copy(pose.quaternion);
       if (this.adjustedControl) {
         let correctionRot = new T.Quaternion(
-          Math.sin(Math.PI / 4),
+          Math.sin(-Math.PI / 4),
           0,
           0,
-          Math.cos(Math.PI / 4)
+          Math.cos(-Math.PI / 4)
+        );
+        ori.multiply(correctionRot);
+      } else {
+        let correctionRot = new T.Quaternion(
+          0,
+          0,
+          Math.sin(-Math.PI / 4),
+          Math.cos(-Math.PI / 4)
         );
         ori.multiply(correctionRot);
       }

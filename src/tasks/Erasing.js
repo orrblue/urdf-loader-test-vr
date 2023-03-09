@@ -90,12 +90,10 @@ export default class Erasing extends Task {
         return goal;
       };
     } else {
-      this.controller.get().grip.traverse((child) => {
-        if (child instanceof T.Mesh) child.visible = false;
-      });
+      window.robotObjs.forEach(
+        (visualGroup, rigidBody) => (visualGroup.visible = false)
+      );
     }
-
-    window.eraser = this.objects.eraser;
 
     const data = {
       id: this.id,
@@ -134,11 +132,9 @@ export default class Erasing extends Task {
       return goal;
     };
 
-    this.controller.get().grip.traverse((child) => {
-      if (child instanceof T.Mesh) child.visible = true;
-    });
-
-    window.eraser = null;
+    window.robotObjs.forEach(
+      (visualGroup, rigidBody) => (visualGroup.visible = true)
+    );
 
     this.updateRequest(true);
     /*
@@ -208,11 +204,10 @@ export default class Erasing extends Task {
   }
 
   updateEraser() {
-    let pose;
     let posi = new T.Vector3();
     let ori = new T.Quaternion();
     if (this.robotControl) {
-      pose = getCurrEEPose();
+      let pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
       let correctionRot = new T.Quaternion(
@@ -229,15 +224,11 @@ export default class Erasing extends Task {
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
     } else {
-      pose = this.controller.getPose("right");
-      posi.copy(pose.posi);
-      ori.copy(pose.ori);
-      let correctionRot = new T.Quaternion(
-        0,
-        Math.sin(Math.PI / 4),
-        0,
-        Math.cos(Math.PI / 4)
-      );
+      let pose = window.targetCursor;
+      posi.copy(pose.position);
+      ori.copy(pose.quaternion);
+      let correctionRot = new T.Quaternion();
+      correctionRot.setFromEuler(new T.Euler(90, 0, -90));
       ori.multiply(correctionRot);
       let correctionTrans = new T.Vector3(0, -0.1, 0);
       correctionTrans.applyQuaternion(ori);
