@@ -227,8 +227,12 @@ export default class Erasing extends Task {
       let pose = window.targetCursor;
       posi.copy(pose.position);
       ori.copy(pose.quaternion);
-      let correctionRot = new T.Quaternion();
-      correctionRot.setFromEuler(new T.Euler(90, 0, -90));
+      let correctionRot = new T.Quaternion(
+        Math.sin(-Math.PI / 4),
+        0,
+        0,
+        Math.cos(-Math.PI / 4)
+      );
       ori.multiply(correctionRot);
       let correctionTrans = new T.Vector3(0, -0.1, 0);
       correctionTrans.applyQuaternion(ori);

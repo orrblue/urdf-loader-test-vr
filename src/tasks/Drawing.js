@@ -277,9 +277,9 @@ export default class Drawing extends Task {
         ori.multiply(correctionRot);
       } else {
         let correctionRot = new T.Quaternion(
-          0,
-          0,
           Math.sin(-Math.PI / 4),
+          0,
+          0,
           Math.cos(-Math.PI / 4)
         );
         ori.multiply(correctionRot);

@@ -28,6 +28,8 @@ import End from "../tasks/End";
 import { DragControl } from "../modules/DragControl";
 import { RemoteControl } from "../modules/RemoteControl";
 import { RedirectedControl } from "../modules/RedirectedControl";
+import { OffsetControl } from "../modules/OffsetControl";
+import { ClutchedOffsetControl } from "../modules/ClutchedOffsetControl";
 import Grasping from "../modules/Grasping";
 
 // initial position of user after entering VR
@@ -69,6 +71,7 @@ export default class Control {
     // whether or not teleportation is enabled,
     // teleportvr is still initialized here because it is used to set the initial position of the user
     control.teleportvr = new TeleportVR(window.scene, control.camera);
+    control.teleportvr.enabled = true;
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
     );
@@ -89,13 +92,13 @@ export default class Control {
       await RemoteControlTutorial.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "sawyer",
@@ -107,7 +110,7 @@ export default class Control {
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "ur5",
@@ -119,7 +122,7 @@ export default class Control {
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "sawyer",
@@ -130,7 +133,7 @@ export default class Control {
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "ur5",
@@ -141,7 +144,7 @@ export default class Control {
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, {
+          new ClutchedOffsetControl(utilities, {
             controlMode: "grip-toggle",
             showOffsetIndicator: false,
           }),
@@ -159,7 +162,7 @@ export default class Control {
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, {
+          new ClutchedOffsetControl(utilities, {
             controlMode: "grip-toggle",
             showOffsetIndicator: false,
           }),

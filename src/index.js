@@ -470,8 +470,12 @@ async function someInit(name) {
     setTimeout(update, 16);
   });
 
+  let time = 0;
+
   // render loop
-  renderer.setAnimationLoop(function () {
+  renderer.setAnimationLoop(function (timestamp) {
+    window.deltaTime = timestamp - time;
+    time = timestamp;
     ThreeMeshUI.update();
     control.teleportvr?.update();
     renderer.render(scene, camera);

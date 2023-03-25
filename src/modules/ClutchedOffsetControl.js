@@ -7,14 +7,15 @@ import {
   resetRobot,
 } from "../utilities/robot";
 
-export class RedirectedControl extends Module {
+export class ClutchedOffsetControl extends Module {
   constructor(utilities, options = {}) {
-    super("redirected-control", utilities);
+    super("clutched-offset-control", utilities);
 
     // ========== options ==========
     this.showOffsetIndicator = options.showOffsetIndicator ?? true;
     this.controlMode = options.controlMode ?? "grip-toggle";
-    this.slerpFactor = 1;
+    this.slerpFactor = options.slerpFactor ?? 1;
+    this.offset = options.offset ?? new T.Quaternion().identity();
     // =============================
 
     this.click = new Audio("./assets/click.wav");
@@ -130,9 +131,7 @@ export class RedirectedControl extends Module {
       );
       window.goalEERelThree.ori.premultiply(deltaOri);
 
-      let factor =
-        Math.abs(info.ctrlPose.ori.angleTo(info.prevCtrlPose.ori.clone())) /
-        (2 * Math.PI);
+      let factor = window.deltaTime / 1000;
       factor *= this.slerpFactor;
       if (factor > 1) {
         factor = 1;
@@ -142,6 +141,7 @@ export class RedirectedControl extends Module {
       let correctionRot = new T.Quaternion();
       correctionRot.setFromEuler(new T.Euler(-Math.PI / 3, Math.PI / 2, 0));
       controllerOri.multiply(correctionRot);
+      controllerOri.multiply(this.offset);
       window.goalEERelThree.ori.slerp(controllerOri, factor);
 
       this.showOffsetIndicator &&
