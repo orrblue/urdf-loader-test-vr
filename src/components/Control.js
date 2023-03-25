@@ -71,6 +71,7 @@ export default class Control {
     // whether or not teleportation is enabled,
     // teleportvr is still initialized here because it is used to set the initial position of the user
     control.teleportvr = new TeleportVR(window.scene, control.camera);
+    control.teleportvr.rotationScheme = "ee";
     control.teleportvr.enabled = true;
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
