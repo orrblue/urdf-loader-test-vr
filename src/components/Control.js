@@ -250,16 +250,17 @@ export default class Control {
       control.fsm.start();
     });
 
-    // use the trigger on the left controller to reset the current trial
-    control.controller.controller[0].controller.addEventListener(
+    // use the trigger on the other controller to reset the current trial
+    const i = control.controller.hand == "right" ? 0 : 1;
+    control.controller.controller[i].controller.addEventListener(
       "select",
       () => {
         control.tasks[Number(control.fsm.state)].fsm.reset();
       }
     );
 
-    // use the gripper on the left controller to continue to the next trial
-    control.controller.controller[0].controller.addEventListener(
+    // use the gripper on the other controller to continue to the next trial
+    control.controller.controller[i].controller.addEventListener(
       "squeeze",
       () => {
         control.tasks[Number(control.fsm.state)].fsm.next();

@@ -41,7 +41,11 @@ export default class Controllers {
       teleportvr.add(1, this.controller[1]);
     });
 
-    this.hand = "right";
+    this.hand = new URLSearchParams(location.search).get("hand");
+    if (this.hand != "left") {
+      this.hand = "right";
+    }
+
     this.buttons = {
       trigger: {},
       triggerstart: {},
