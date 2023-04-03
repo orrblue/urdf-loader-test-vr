@@ -27,17 +27,17 @@ export default class Pouring extends Task {
   constructor(params, condition, options) {
     super("pouring", params, condition, options, [
       () => {
-        this.objects.cup.set({ position: new T.Vector3(0.8, 1, 0.5) });
+        this.objects.cup.set({ position: new T.Vector3(0.6, 1, -0.25) });
         for (let i = 0; i < this.objects.particles.length; i++) {
           this.objects.particles[i].set({
             position: new T.Vector3(
-              0.795 + Math.random() * 0.01,
+              0.595 + Math.random() * 0.01,
               1.05 + i * 0.05,
-              0.495 + Math.random() * 0.01
+              -0.255 + Math.random() * 0.01
             ),
           });
         }
-        this.objects.box.set({ position: new T.Vector3(0.8, 1, -0.5) });
+        this.objects.box.set({ position: new T.Vector3(0.5, 1, 0) });
       },
     ]);
   }

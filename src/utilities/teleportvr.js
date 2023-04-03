@@ -8,6 +8,7 @@ import * as THREE from "three";
 
 export default class TeleportVR {
   constructor(scene, camera) {
+    this.firstPerson = false;
     this.rotationScheme = "default";
     this.enabled = false;
     this._group = new THREE.Group();
@@ -107,6 +108,13 @@ export default class TeleportVR {
   set(pos) {
     this._group.position.copy(pos);
   }
+  setCamPos(pos) {
+    this.set(
+      pos.add(
+        this._group.position.clone().addScaledVector(window.camera.position, -1)
+      )
+    );
+  }
 
   update(elevationsMeshList) {
     if (
@@ -116,6 +124,10 @@ export default class TeleportVR {
       !this._controllers[1]
     ) {
       return;
+    }
+
+    if (this.firstPerson) {
+      this.setCamPos(new THREE.Vector3(0.15, 1.5, 0));
     }
 
     if (Object.keys(this._gamePads).length > 0) {

@@ -73,6 +73,7 @@ export default class Control {
     control.teleportvr = new TeleportVR(window.scene, control.camera);
     control.teleportvr.rotationScheme = "ee";
     control.teleportvr.enabled = true;
+    control.teleportvr.firstPerson = true;
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
     );
@@ -90,6 +91,24 @@ export default class Control {
     };
 
     control.tasks = [
+      await GraspingTutorial.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
+          new Grasping(utilities, { controlMode: "trigger-toggle" }),
+        ])
+      ),
+      await Pouring.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
+          new Grasping(utilities, { controlMode: "trigger-toggle" }),
+        ]),
+        {
+          firstPerson: true,
+          text: "Pouring Task.\n\n",
+        }
+      ),
       await RemoteControlTutorial.init(
         utilities,
         new Condition("redirected-control-only", [
@@ -171,22 +190,6 @@ export default class Control {
         {
           robotControl: false,
           text: "Hand Erasing.\n\n",
-        }
-      ),
-      await GraspingTutorial.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ])
-      ),
-      await Pouring.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          text: "Pouring Task.\n\n",
         }
       ),
       await End.init(

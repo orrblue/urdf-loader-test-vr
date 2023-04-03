@@ -306,6 +306,7 @@ window.setRobot = (name) => {
 const [scene, camera, renderer, camControls] = init();
 window.scene = scene;
 window.camera = camera;
+window.renderer = renderer;
 
 const gravity = { x: 0.0, y: -9.81, z: 0.0 };
 const world = new RAPIER.World(gravity);
