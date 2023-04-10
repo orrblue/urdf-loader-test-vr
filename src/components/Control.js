@@ -3,11 +3,7 @@
  */
 
 import * as T from "three";
-import {
-  getCurrEEPose,
-  updateTargetCursor,
-  updateRobot,
-} from "../utilities/robot";
+import { getCurrEEPose, updateRobot } from "../utilities/robot";
 import StateMachine from "javascript-state-machine";
 import TeleportVR from "../utilities/teleportvr";
 import Controllers from "./Controllers";
@@ -46,34 +42,14 @@ export default class Control {
     control.world = params.world;
     control.ground = params.ground;
 
-    // initial end effector pose
-    window.initEEAbsThree = getCurrEEPose();
-    window.goalEERelThree = {
-      posi: new T.Vector3(),
-      ori: new T.Quaternion().identity(),
-    };
-    window.adjustedControl = (goal) => {
-      return goal;
-    };
-
-    // target cursor
-    const targetCursor = new T.Mesh(
-      new T.SphereGeometry(0.015, 32, 32),
-      new T.MeshBasicMaterial({ color: 0xffffff })
-    );
-    targetCursor.renderOrder = Infinity;
-    targetCursor.material.depthTest = false;
-    targetCursor.material.depthWrite = false;
-    window.scene.add(targetCursor);
-    window.targetCursor = targetCursor;
-    updateTargetCursor();
+    const pose = getCurrEEPose();
+    window.initEEAbsThree.position.copy(pose.posi);
 
     // whether or not teleportation is enabled,
     // teleportvr is still initialized here because it is used to set the initial position of the user
     control.teleportvr = new TeleportVR(window.scene, control.camera);
     control.teleportvr.rotationScheme = "ee";
-    control.teleportvr.enabled = true;
-    control.teleportvr.firstPerson = true;
+    //control.teleportvr.enabled = true;
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
     );
@@ -91,24 +67,6 @@ export default class Control {
     };
 
     control.tasks = [
-      await GraspingTutorial.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ])
-      ),
-      await Pouring.init(
-        utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ]),
-        {
-          firstPerson: true,
-          text: "Pouring Task.\n\n",
-        }
-      ),
       await RemoteControlTutorial.init(
         utilities,
         new Condition("redirected-control-only", [
@@ -190,6 +148,24 @@ export default class Control {
         {
           robotControl: false,
           text: "Hand Erasing.\n\n",
+        }
+      ),
+      await GraspingTutorial.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new Grasping(utilities, { controlMode: "trigger-toggle" }),
+        ])
+      ),
+      await Pouring.init(
+        utilities,
+        new Condition("drag-control-only", [
+          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new Grasping(utilities, { controlMode: "trigger-toggle" }),
+        ]),
+        {
+          firstPerson: true,
+          text: "Pouring Task.\n\n",
         }
       ),
       await End.init(
@@ -274,6 +250,22 @@ export default class Control {
   }
 
   update(t) {
+    let right_gp = this.controller.get("right").gamepad;
+    if (right_gp) {
+      window.robotGroup.rotateY((-right_gp.axes[2] * window.deltaTime) / 5000);
+    }
+
+    let left_gp = this.controller.get("left").gamepad;
+    if (left_gp) {
+      let direction = new T.Vector3(
+        -left_gp.axes[3],
+        0,
+        left_gp.axes[2]
+      ).normalize();
+      window.robotGroup.translateX((direction.x * window.deltaTime) / 5000);
+      window.robotGroup.translateZ((direction.z * window.deltaTime) / 5000);
+    }
+
     const state = {
       ctrlPose: this.controller.getPose(),
       currEEAbsThree: getCurrEEPose(),
@@ -289,7 +281,6 @@ export default class Control {
     }
 
     this.controller.update();
-    updateTargetCursor();
     updateRobot();
 
     this.prevCtrlPose = { ...state.ctrlPose };

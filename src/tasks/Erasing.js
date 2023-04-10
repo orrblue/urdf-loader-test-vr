@@ -224,14 +224,13 @@ export default class Erasing extends Task {
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
     } else {
-      let pose = window.targetCursor;
-      posi.copy(pose.position);
-      ori.copy(pose.quaternion);
+      posi.copy(window.goalEERelThree.getWorldPosition(new T.Vector3()));
+      ori.copy(window.goalEERelThree.getWorldQuaternion(new T.Quaternion()));
       let correctionRot = new T.Quaternion(
-        Math.sin(-Math.PI / 4),
         0,
         0,
-        Math.cos(-Math.PI / 4)
+        Math.sin(Math.PI / 4),
+        Math.cos(Math.PI / 4)
       );
       ori.multiply(correctionRot);
       let correctionTrans = new T.Vector3(0, -0.1, 0);

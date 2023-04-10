@@ -1,11 +1,6 @@
 import Module from "./Module";
 import * as T from "three";
-import {
-  getCurrEEPose,
-  updateTargetCursor,
-  updateRobot,
-  resetRobot,
-} from "../utilities/robot";
+import { getCurrEEPose, updateRobot, resetRobot } from "../utilities/robot";
 
 export class RemoteControl extends Module {
   constructor(utilities, options = {}) {
@@ -35,7 +30,7 @@ export class RemoteControl extends Module {
     };
     config.methods["onDeactivateRemoteControl"] = () => {
       window.scene.remove(this.offsetIndicator);
-      window.targetCursor.material.color.setHex(0xffffff);
+      window.goalEERelThree.material.color.setHex(0xffffff);
     };
 
     this.loadControlMode(this.controlMode);
@@ -120,21 +115,26 @@ export class RemoteControl extends Module {
     if (this.fsm.is("REMOTE_CONTROL")) {
       const deltaPosi = new T.Vector3();
       deltaPosi.subVectors(info.ctrlPose.posi, info.prevCtrlPose.posi);
-      window.goalEERelThree.posi.add(deltaPosi);
+      deltaPosi.applyQuaternion(window.robotGroup.quaternion.clone().invert());
+      window.goalEERelThree.position.add(deltaPosi);
 
       const deltaOri = new T.Quaternion();
       deltaOri.multiplyQuaternions(
-        info.ctrlPose.ori.clone(),
-        info.prevCtrlPose.ori.clone().invert()
+        info.ctrlPose.ori
+          .clone()
+          .premultiply(window.robotGroup.quaternion.clone().invert()),
+        info.prevCtrlPose.ori
+          .clone()
+          .premultiply(window.robotGroup.quaternion.clone().invert())
+          .invert()
       );
-      window.goalEERelThree.ori.premultiply(deltaOri);
+      window.goalEERelThree.quaternion.premultiply(deltaOri);
 
       this.showOffsetIndicator &&
         this.updateOffsetIndicator(
           info.currEEAbsThree.posi,
-          window.targetCursor.position
+          window.goalEERelThree.getWorldPosition(new T.Vector3())
         );
-      updateTargetCursor(window.goalEERelThree);
       updateRobot(window.goalEERelThree);
     }
   }
@@ -155,7 +155,7 @@ export class RemoteControl extends Module {
       new T.LineBasicMaterial({ transparent: true, opacity: 1, color })
     );
 
-    window.targetCursor.material.color.setHex(color);
+    window.goalEERelThree.material.color.setHex(color);
     window.scene.add(this.offsetIndicator);
   }
 }

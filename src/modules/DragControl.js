@@ -1,10 +1,6 @@
 import Module from "./Module";
 import * as T from "three";
-import {
-  getCurrEEPose,
-  updateTargetCursor,
-  updateRobot,
-} from "../utilities/robot";
+import { getCurrEEPose, updateRobot } from "../utilities/robot";
 import { CLICK } from "../utilities/sounds";
 
 export class DragControl extends Module {
@@ -40,7 +36,7 @@ export class DragControl extends Module {
       this.controller.get().grip.traverse((child) => {
         if (child instanceof T.Mesh) child.visible = true;
       });
-      window.targetCursor.material.color.setHex(0xffffff);
+      window.goalEERelThree.material.color.setHex(0xffffff);
       window.scene.remove(this.offsetIndicator);
       this.dragTimeout = true;
       setTimeout(() => (this.dragTimeout = false), 1000);
@@ -172,22 +168,30 @@ export class DragControl extends Module {
 
     if (this.fsm.is("DRAG_CONTROL")) {
       const deltaPosi = new T.Vector3();
-      deltaPosi.subVectors(info.ctrlPose.posi, window.initEEAbsThree.posi);
-      window.goalEERelThree.posi.copy(deltaPosi);
+      deltaPosi.subVectors(
+        info.ctrlPose.posi,
+        window.initEEAbsThree.getWorldPosition(new T.Vector3())
+      );
+      deltaPosi.applyQuaternion(window.robotGroup.quaternion.clone().invert());
+      window.goalEERelThree.position.copy(deltaPosi);
 
       const deltaOri = new T.Quaternion();
       deltaOri.multiplyQuaternions(
-        info.ctrlPose.ori,
-        info.prevCtrlPose.ori.invert()
+        info.ctrlPose.ori
+          .clone()
+          .premultiply(window.robotGroup.quaternion.clone().invert()),
+        info.prevCtrlPose.ori
+          .clone()
+          .premultiply(window.robotGroup.quaternion.clone().invert())
+          .invert()
       );
-      window.goalEERelThree.ori.premultiply(deltaOri);
+      window.goalEERelThree.quaternion.premultiply(deltaOri);
 
       this.showOffsetIndicator &&
         this.updateOffsetIndicator(
           info.currEEAbsThree.posi,
-          window.targetCursor.position
+          window.goalEERelThree.getWorldPosition(new T.Vector3())
         );
-      updateTargetCursor(window.goalEERelThree);
       updateRobot(window.goalEERelThree);
     }
   }
@@ -208,7 +212,7 @@ export class DragControl extends Module {
       new T.LineBasicMaterial({ transparent: true, opacity: 1, color })
     );
 
-    window.targetCursor.material.color.setHex(color);
+    window.goalEERelThree.material.color.setHex(color);
     window.scene.add(this.offsetIndicator);
   }
 }

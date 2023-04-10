@@ -1,6 +1,6 @@
 import Module from "./Module";
 import * as T from "three";
-import { updateTargetCursor, updateRobot } from "../utilities/robot";
+import { updateRobot } from "../utilities/robot";
 
 export class OffsetControl extends Module {
   constructor(utilities, options = {}) {
@@ -31,7 +31,7 @@ export class OffsetControl extends Module {
     };
     config.methods["onDeactivateRemoteControl"] = () => {
       window.scene.remove(this.offsetIndicator);
-      window.targetCursor.material.color.setHex(0xffffff);
+      window.goalEERelThree.material.color.setHex(0xffffff);
     };
 
     this.loadControlMode(this.controlMode);
@@ -114,25 +114,26 @@ export class OffsetControl extends Module {
 
   update(t, info) {
     const ori = info.ctrlPose.ori.clone();
+    ori.premultiply(window.robotGroup.quaternion.clone().invert());
     let correctionRot = new T.Quaternion();
     correctionRot.setFromEuler(new T.Euler(-Math.PI / 3, Math.PI / 2, 0));
     ori.multiply(correctionRot);
     ori.multiply(this.offset);
-    window.goalEERelThree.ori = ori;
+    window.goalEERelThree.quaternion.copy(ori);
 
     if (this.fsm.is("REMOTE_CONTROL")) {
       const deltaPosi = new T.Vector3();
       deltaPosi.subVectors(info.ctrlPose.posi, info.prevCtrlPose.posi);
-      window.goalEERelThree.posi.add(deltaPosi);
+      deltaPosi.applyQuaternion(window.robotGroup.quaternion.clone().invert());
+      window.goalEERelThree.position.add(deltaPosi);
 
       this.showOffsetIndicator &&
         this.updateOffsetIndicator(
           info.currEEAbsThree.posi,
-          window.targetCursor.position
+          window.goalEERelThree.getWorldPosition(new T.Vector3())
         );
     }
 
-    updateTargetCursor(window.goalEERelThree);
     updateRobot(window.goalEERelThree);
   }
 
@@ -152,7 +153,7 @@ export class OffsetControl extends Module {
       new T.LineBasicMaterial({ transparent: true, opacity: 1, color })
     );
 
-    window.targetCursor.material.color.setHex(color);
+    window.goalEERelThree.material.color.setHex(color);
     window.scene.add(this.offsetIndicator);
   }
 }

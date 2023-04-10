@@ -1,11 +1,6 @@
 import Module from "./Module";
 import * as T from "three";
-import {
-  getCurrEEPose,
-  updateTargetCursor,
-  updateRobot,
-  resetRobot,
-} from "../utilities/robot";
+import { getCurrEEPose, updateRobot, resetRobot } from "../utilities/robot";
 
 export class ClutchedOffsetControl extends Module {
   constructor(utilities, options = {}) {
@@ -37,7 +32,7 @@ export class ClutchedOffsetControl extends Module {
     };
     config.methods["onDeactivateRemoteControl"] = () => {
       window.scene.remove(this.offsetIndicator);
-      window.targetCursor.material.color.setHex(0xffffff);
+      window.goalEERelThree.material.color.setHex(0xffffff);
     };
 
     this.loadControlMode(this.controlMode);
@@ -122,14 +117,20 @@ export class ClutchedOffsetControl extends Module {
     if (this.fsm.is("REMOTE_CONTROL")) {
       const deltaPosi = new T.Vector3();
       deltaPosi.subVectors(info.ctrlPose.posi, info.prevCtrlPose.posi);
-      window.goalEERelThree.posi.add(deltaPosi);
+      deltaPosi.applyQuaternion(window.robotGroup.quaternion.clone().invert());
+      window.goalEERelThree.position.add(deltaPosi);
 
       const deltaOri = new T.Quaternion();
       deltaOri.multiplyQuaternions(
-        info.ctrlPose.ori.clone(),
-        info.prevCtrlPose.ori.clone().invert()
+        info.ctrlPose.ori
+          .clone()
+          .premultiply(window.robotGroup.quaternion.clone().invert()),
+        info.prevCtrlPose.ori
+          .clone()
+          .premultiply(window.robotGroup.quaternion.clone().invert())
+          .invert()
       );
-      window.goalEERelThree.ori.premultiply(deltaOri);
+      window.goalEERelThree.quaternion.premultiply(deltaOri);
 
       let factor = window.deltaTime / 1000;
       factor *= this.slerpFactor;
@@ -138,18 +139,18 @@ export class ClutchedOffsetControl extends Module {
       }
 
       let controllerOri = info.ctrlPose.ori.clone();
+      controllerOri.premultiply(window.robotGroup.quaternion.clone().invert());
       let correctionRot = new T.Quaternion();
       correctionRot.setFromEuler(new T.Euler(-Math.PI / 3, Math.PI / 2, 0));
       controllerOri.multiply(correctionRot);
       controllerOri.multiply(this.offset);
-      window.goalEERelThree.ori.slerp(controllerOri, factor);
+      window.goalEERelThree.quaternion.slerp(controllerOri, factor);
 
       this.showOffsetIndicator &&
         this.updateOffsetIndicator(
           info.currEEAbsThree.posi,
-          window.targetCursor.position
+          window.goalEERelThree.getWorldPosition(new T.Vector3())
         );
-      updateTargetCursor(window.goalEERelThree);
       updateRobot(window.goalEERelThree);
     }
   }
@@ -170,7 +171,7 @@ export class ClutchedOffsetControl extends Module {
       new T.LineBasicMaterial({ transparent: true, opacity: 1, color })
     );
 
-    window.targetCursor.material.color.setHex(color);
+    window.goalEERelThree.material.color.setHex(color);
     window.scene.add(this.offsetIndicator);
   }
 }

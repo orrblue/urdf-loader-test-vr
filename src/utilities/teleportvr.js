@@ -140,10 +140,12 @@ export default class TeleportVR {
           this._activeControllerKey = key;
           this._visible = true;
           if (this.rotationScheme == "ee") {
-            let goal = window.targetCursor.position.clone();
+            let goal = window.goalEERelThree
+              .getWorldPosition(new T.Vector3())
+              .clone();
             goal.y = 0;
             this._target.lookAt(goal);
-            this.target.rotateY(Math.PI);
+            this._target.rotateY(Math.PI);
           } else if (
             this.rotationScheme == "default" &&
             Math.abs(gp.axes[2]) + Math.abs(gp.axes[3]) > 0.25

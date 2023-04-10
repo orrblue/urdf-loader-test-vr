@@ -32,22 +32,24 @@ export function computeGripper(eePose) {
 }
 
 export function getCurrEEPose() {
+  let posi = window.robotGroup.position.clone();
+  let ori = window.robotGroup.quaternion.clone();
+  let link = null;
   if (window.robotName == "sawyer") {
-    return {
-      posi: window.robot.links.right_hand.getWorldPosition(new T.Vector3()),
-      ori: window.robot.links.right_hand.getWorldQuaternion(new T.Quaternion()),
-    };
+    link = window.robot.links.right_hand;
   } else if (window.robotName == "ur5") {
-    return {
-      posi: window.robot.links.finger_tip.getWorldPosition(new T.Vector3()),
-      ori: window.robot.links.finger_tip.getWorldQuaternion(new T.Quaternion()),
-    };
-  } else {
-    return {
-      posi: window.robot.links.gripper.getWorldPosition(new T.Vector3()),
-      ori: window.robot.links.gripper.getWorldQuaternion(new T.Quaternion()),
-    };
+    link = window.robot.links.finger_tip;
+  } else if (window.robotName == "spot") {
+    link = window.robot.links.gripper;
   }
+  if (link) {
+    posi.add(link.getWorldPosition(new T.Vector3()).applyQuaternion(ori));
+    ori.multiply(link.getWorldQuaternion(new T.Quaternion()));
+  }
+  return {
+    posi: posi,
+    ori: ori,
+  };
 }
 
 export function getGripperPose(tip = false) {
@@ -112,18 +114,11 @@ export function updateRobot() {
 }
 
 export function resetRobot() {
-  window.goalEERelThree = {
-    posi: new T.Vector3(),
-    ori: new T.Quaternion().identity(),
-  };
+  window.robotGroup.position.x = 0;
+  window.robotGroup.position.z = 0;
+  window.robotGroup.quaternion.copy(new T.Quaternion().identity());
+  window.goalEERelThree.position.copy(new T.Vector3());
+  window.goalEERelThree.quaternion.copy(new T.Quaternion().identity());
   window.relaxedIK.reset([]);
   updateRobot();
-  updateTargetCursor();
-}
-
-export function updateTargetCursor() {
-  const goalEEAbsThree = relToAbs(window.goalEERelThree, window.initEEAbsThree);
-  window.targetCursor.position.copy(goalEEAbsThree.posi);
-  window.targetCursor.quaternion.copy(goalEEAbsThree.ori);
-  window.targetCursor.matrixWorldNeedsUpdate = true;
 }

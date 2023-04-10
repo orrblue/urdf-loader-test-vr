@@ -8,8 +8,8 @@ export function rotQuaternion(q, rot) {
 
 export function changeReferenceFrame(pose, transform) {
   return {
-    posi: pose.posi.clone().applyMatrix4(transform.clone()),
-    ori: rotQuaternion(pose.ori.clone(), transform.clone()),
+    posi: pose.position.clone().applyMatrix4(transform.clone()),
+    ori: rotQuaternion(pose.quaternion.clone(), transform.clone()),
   };
 }
 

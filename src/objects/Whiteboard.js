@@ -4,7 +4,6 @@ import RAPIER from "@dimforge/rapier3d";
 import Controllers from "../components/Controllers";
 import SceneObject from "./SceneObject";
 import { T_ROS_to_THREE } from "../utilities/globals";
-import { changeReferenceFrame } from "../utilities/math";
 
 const PATH = "./models/whiteboard.glb";
 

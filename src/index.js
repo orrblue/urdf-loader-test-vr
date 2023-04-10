@@ -111,6 +111,7 @@ function loadRobot(
 
       window.robots[name].linkToRigidBody = new Map();
       window.robots[name].robotObjs = new Map();
+      window.robots[name].robotGroup = new T.Group();
 
       function initRobotPhysics(currJoint) {
         if (
@@ -150,7 +151,7 @@ function loadRobot(
 
                 const visualGroup = new T.Group();
                 visualGroup.add(urdfVisual);
-                //scene.add(visualGroup);
+                window.robots[name].robotGroup.add(visualGroup);
                 window.robots[name].robotObjs.set(rigidBody, visualGroup);
               }
 
@@ -255,7 +256,7 @@ function loadRobot(
 
           const visualGroup = new T.Group();
           visualGroup.add(urdfVisual);
-          //scene.add(visualGroup);
+          window.robots[name].robotGroup.add(visualGroup);
           window.robots[name].robotObjs.set(rigidBody, visualGroup);
         }
       }
@@ -282,9 +283,8 @@ window.setRobot = (name) => {
   window.robotObjs.forEach((visualGroup, rigidBody) =>
     window.simObjs.delete(visualGroup)
   );
-  window.robotObjs.forEach((visualGroup, rigidBody) =>
-    scene.remove(visualGroup)
-  );
+  window.robotGroup.remove(window.initEEAbsThree);
+  scene.remove(window.robotGroup);
   window.robot = window.robots[name].robot;
   window.robotName = window.robots[name].robotName;
   window.robotColliders = window.robots[name].robotColliders;
@@ -293,9 +293,11 @@ window.setRobot = (name) => {
   window.relaxedIK = window.robots[name].relaxedIK;
   window.linkToRigidBody = window.robots[name].linkToRigidBody;
   window.robotObjs = window.robots[name].robotObjs;
+  window.robotGroup = window.robots[name].robotGroup;
   window.leftFinger = window.robots[name].leftFinger;
   window.rightFinger = window.robots[name].rightFinger;
-  window.robotObjs.forEach((visualGroup, rigidBody) => scene.add(visualGroup));
+  scene.add(window.robotGroup);
+  window.robotGroup.add(window.initEEAbsThree);
   window.robotObjs.forEach((visualGroup, rigidBody) =>
     window.simObjs.set(rigidBody, visualGroup)
   );
@@ -325,8 +327,25 @@ const groundCollisionGroups = 0x00020001;
 ground.setCollisionGroups(groundCollisionGroups);
 
 window.robotObjs = new Map();
+window.robotGroup = new T.Group();
 window.simObjs = new Map();
 window.robots = {};
+
+// End Effector Goal
+window.initEEAbsThree = new T.Group();
+window.goalEERelThree = new T.Mesh(
+  new T.SphereGeometry(0.015, 32, 32),
+  new T.MeshBasicMaterial({ color: 0xffffff })
+);
+window.goalEERelThree.renderOrder = Infinity;
+window.goalEERelThree.material.depthTest = false;
+window.goalEERelThree.material.depthWrite = false;
+window.initEEAbsThree.add(window.goalEERelThree);
+window.robotGroup.add(window.initEEAbsThree);
+
+window.adjustedControl = (goal) => {
+  return goal;
+};
 
 // load robot
 const robots = {
