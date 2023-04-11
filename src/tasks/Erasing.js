@@ -18,7 +18,7 @@ export default class Erasing extends Task {
     task.setRobot = options.setRobot ?? "";
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
-    task.stopOnCollision = options.stopOnCollision ?? true;
+    task.stopOnCollision = options.stopOnCollision ?? false;
     task.material = new T.LineBasicMaterial({
       color: options.color ?? "blue",
       linewidth: options.lineWidth ?? 5,
@@ -70,6 +70,9 @@ export default class Erasing extends Task {
 
     if (this.robotControl) {
       window.adjustedControl = (goal) => {
+        let posi = goal.position.clone();
+        let ori = goal.quaternion.clone();
+
         if (this.stopOnCollision) {
           for (let y = -0.075; y <= 0.075; y += 0.15) {
             for (let z = -0.025; z <= 0.025; z += 0.05) {
@@ -77,17 +80,21 @@ export default class Erasing extends Task {
               if (window.robotName == "sawyer") {
                 direction.x = 0.15;
               }
-              direction.applyQuaternion(goal.ori);
-              goal.posi.add(direction);
-              if (goal.posi.x > 0.4) {
-                goal.posi.x = 0.4;
+              direction.applyQuaternion(ori);
+              posi.add(direction);
+              if (posi.x > 0.4) {
+                posi.x = 0.4;
               }
               direction.multiplyScalar(-1);
-              goal.posi.add(direction);
+              posi.add(direction);
             }
           }
         }
-        return goal;
+
+        return {
+          posi: posi,
+          ori: ori,
+        };
       };
     } else {
       window.robotObjs.forEach(
@@ -129,7 +136,10 @@ export default class Erasing extends Task {
     }
 
     window.adjustedControl = (goal) => {
-      return goal;
+      return {
+        posi: goal.position.clone(),
+        ori: goal.quaternion.clone(),
+      };
     };
 
     window.robotObjs.forEach(

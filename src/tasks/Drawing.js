@@ -20,7 +20,7 @@ export default class Drawing extends Task {
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.drawVibrationStrength = options.drawVibrationStrength ?? 0;
     task.rotationBased = options.rotationBased ?? true;
-    task.stopOnCollision = options.stopOnCollision ?? true;
+    task.stopOnCollision = options.stopOnCollision ?? false;
     task.pointerSize = options.pointerSize ?? 0;
     task.points = [[]];
     task.material = new T.LineBasicMaterial({
@@ -85,11 +85,15 @@ export default class Drawing extends Task {
 
     if (this.robotControl) {
       window.adjustedControl = (goal) => {
+        let posi = goal.position.clone();
+        let ori = goal.quaternion.clone();
+
         if (this.adjustedControl) {
           let direction = new T.Vector3(-0.1, 0, 0);
-          direction.applyQuaternion(goal.ori);
-          goal.posi.add(direction);
+          direction.applyQuaternion(ori);
+          posi.add(direction);
         }
+
         if (this.stopOnCollision) {
           let direction = new T.Vector3(0, 0, 0);
           if (window.robotName == "sawyer") {
@@ -97,15 +101,19 @@ export default class Drawing extends Task {
           } else {
             direction.x = 0.1;
           }
-          direction.applyQuaternion(goal.ori);
-          goal.posi.add(direction);
-          if (goal.posi.x > 0.38) {
-            goal.posi.x = 0.38;
+          direction.applyQuaternion(ori);
+          posi.add(direction);
+          if (posi.x > 0.38) {
+            posi.x = 0.38;
           }
           direction.multiplyScalar(-1);
-          goal.posi.add(direction);
+          posi.add(direction);
         }
-        return goal;
+
+        return {
+          posi: posi,
+          ori: ori,
+        };
       };
     } else {
       window.robotObjs.forEach(
@@ -188,7 +196,10 @@ export default class Drawing extends Task {
     }
 
     window.adjustedControl = (goal) => {
-      return goal;
+      return {
+        posi: goal.position.clone(),
+        ori: goal.quaternion.clone(),
+      };
     };
 
     window.robotObjs.forEach(

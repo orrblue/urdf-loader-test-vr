@@ -50,6 +50,7 @@ export default class Control {
     control.teleportvr = new TeleportVR(window.scene, control.camera);
     control.teleportvr.rotationScheme = "ee";
     //control.teleportvr.enabled = true;
+    window.firstPerson = false;
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
     );
@@ -67,16 +68,16 @@ export default class Control {
     };
 
     control.tasks = [
-      await RemoteControlTutorial.init(
+      await DragControlTutorial.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "sawyer",
@@ -88,7 +89,7 @@ export default class Control {
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "ur5",
@@ -100,7 +101,7 @@ export default class Control {
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "sawyer",
@@ -111,7 +112,7 @@ export default class Control {
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
           setRobot: "ur5",
@@ -122,7 +123,7 @@ export default class Control {
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, {
+          new DragControl(utilities, {
             controlMode: "grip-toggle",
             showOffsetIndicator: false,
           }),
@@ -140,7 +141,7 @@ export default class Control {
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
-          new ClutchedOffsetControl(utilities, {
+          new DragControl(utilities, {
             controlMode: "grip-toggle",
             showOffsetIndicator: false,
           }),
@@ -153,14 +154,14 @@ export default class Control {
       await GraspingTutorial.init(
         utilities,
         new Condition("drag-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ])
       ),
       await Pouring.init(
         utilities,
         new Condition("drag-control-only", [
-          new ClutchedOffsetControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
           new Grasping(utilities, { controlMode: "trigger-toggle" }),
         ]),
         {
@@ -171,7 +172,7 @@ export default class Control {
       await End.init(
         utilities,
         new Condition("redirected-control-only", [
-          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          new DragControl(utilities, { controlMode: "grip-toggle" }),
         ])
       ),
     ];
@@ -250,20 +251,29 @@ export default class Control {
   }
 
   update(t) {
-    let right_gp = this.controller.get("right").gamepad;
-    if (right_gp) {
-      window.robotGroup.rotateY((-right_gp.axes[2] * window.deltaTime) / 5000);
-    }
+    if (window.firstPerson) {
+      window.robotGroup.position.x = window.camera.position.x;
+      window.robotGroup.rotation.y = window.camera.rotation.y + Math.PI / 2;
+      window.robotGroup.position.z = window.camera.position.z;
+      window.robotGroup.translateX(-0.15);
+    } else {
+      let right_gp = this.controller.get("right").gamepad;
+      if (right_gp) {
+        window.robotGroup.rotateY(
+          (-right_gp.axes[2] * window.deltaTime) / 5000
+        );
+      }
 
-    let left_gp = this.controller.get("left").gamepad;
-    if (left_gp) {
-      let direction = new T.Vector3(
-        -left_gp.axes[3],
-        0,
-        left_gp.axes[2]
-      ).normalize();
-      window.robotGroup.translateX((direction.x * window.deltaTime) / 5000);
-      window.robotGroup.translateZ((direction.z * window.deltaTime) / 5000);
+      let left_gp = this.controller.get("left").gamepad;
+      if (left_gp) {
+        let direction = new T.Vector3(
+          -left_gp.axes[3],
+          0,
+          left_gp.axes[2]
+        ).normalize();
+        window.robotGroup.translateX((direction.x * window.deltaTime) / 5000);
+        window.robotGroup.translateZ((direction.z * window.deltaTime) / 5000);
+      }
     }
 
     const state = {

@@ -117,6 +117,16 @@ export default class TeleportVR {
   }
 
   update(elevationsMeshList) {
+    if (window.firstPerson) {
+      this.setCamPos(
+        new THREE.Vector3(
+          window.camera.position.x,
+          1.5,
+          window.camera.position.z
+        )
+      );
+    }
+
     if (
       (this.fsm && !this.fsm.is("IDLE")) ||
       !this.enabled ||
@@ -124,10 +134,6 @@ export default class TeleportVR {
       !this._controllers[1]
     ) {
       return;
-    }
-
-    if (this.firstPerson) {
-      this.setCamPos(new THREE.Vector3(0.15, 1.5, 0));
     }
 
     if (Object.keys(this._gamePads).length > 0) {

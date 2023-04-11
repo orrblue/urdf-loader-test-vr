@@ -257,7 +257,6 @@ function loadRobot(
           const visualGroup = new T.Group();
           visualGroup.add(urdfVisual);
           window.robots[name].robotGroup.add(visualGroup);
-          window.robots[name].robotObjs.set(rigidBody, visualGroup);
         }
       }
 
@@ -344,7 +343,10 @@ window.initEEAbsThree.add(window.goalEERelThree);
 window.robotGroup.add(window.initEEAbsThree);
 
 window.adjustedControl = (goal) => {
-  return goal;
+  return {
+    posi: goal.position.clone(),
+    ori: goal.quaternion.clone(),
+  };
 };
 
 // load robot

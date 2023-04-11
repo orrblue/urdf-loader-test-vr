@@ -74,20 +74,22 @@ export function getGripperPose(tip = false) {
  * @returns True if the robot is updated, false otherwise
  */
 export function updateRobot() {
-  const goalEERelRos = changeReferenceFrame(
-    window.goalEERelThree,
-    T_ROS_to_THREE
-  );
-  const goal = window.adjustedControl(goalEERelRos);
+  const goal = window.adjustedControl(window.goalEERelThree);
+  const goalEERelRos = changeReferenceFrame(goal, T_ROS_to_THREE);
   const currEEAbsThree = getCurrEEPose();
 
-  const deltaPosi = currEEAbsThree.posi.distanceTo(goal.posi); // distance difference
-  const deltaOri = currEEAbsThree.ori.angleTo(goal.ori); // angle difference
+  const deltaPosi = currEEAbsThree.posi.distanceTo(goalEERelRos.posi); // distance difference
+  const deltaOri = currEEAbsThree.ori.angleTo(goalEERelRos.ori); // angle difference
 
   if (deltaPosi > 1e-3 || deltaOri > 1e-3) {
     const result = window.relaxedIK.solve(
-      [goal.posi.x, goal.posi.y, goal.posi.z],
-      [goal.ori.w, goal.ori.x, goal.ori.y, goal.ori.z]
+      [goalEERelRos.posi.x, goalEERelRos.posi.y, goalEERelRos.posi.z],
+      [
+        goalEERelRos.ori.w,
+        goalEERelRos.ori.x,
+        goalEERelRos.ori.y,
+        goalEERelRos.ori.z,
+      ]
     );
 
     const joints = Object.entries(window.robot.joints).filter(
