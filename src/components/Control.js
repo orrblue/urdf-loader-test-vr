@@ -48,9 +48,9 @@ export default class Control {
     // whether or not teleportation is enabled,
     // teleportvr is still initialized here because it is used to set the initial position of the user
     control.teleportvr = new TeleportVR(window.scene, control.camera);
+    window.teleportvr = control.teleportvr;
     control.teleportvr.rotationScheme = "ee";
-    //control.teleportvr.enabled = true;
-    window.firstPerson = false;
+    control.teleportvr.enabled = true;
     control.renderer.xr.addEventListener("sessionstart", () =>
       control.teleportvr.set(INIT_POSITION)
     );
@@ -253,7 +253,10 @@ export default class Control {
   update(t) {
     if (window.firstPerson) {
       window.robotGroup.position.x = window.camera.position.x;
-      window.robotGroup.rotation.y = window.camera.rotation.y + Math.PI / 2;
+      const direction = new T.Vector3(0, 0, 1).applyQuaternion(
+        window.camera.quaternion
+      );
+      window.robotGroup.rotation.y = Math.atan2(direction.z, -direction.x);
       window.robotGroup.position.z = window.camera.position.z;
       window.robotGroup.translateX(-0.15);
     } else {

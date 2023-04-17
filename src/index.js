@@ -349,6 +349,8 @@ window.adjustedControl = (goal) => {
   };
 };
 
+window.firstPerson = false;
+
 // load robot
 const robots = {
   sawyer: {

@@ -8,8 +8,10 @@ import * as THREE from "three";
 
 export default class TeleportVR {
   constructor(scene, camera) {
-    this.firstPerson = false;
-    this.rotationScheme = "default";
+    this.controlScheme = "hold";
+    this.settingTeleport = false;
+    this.rotationScheme = "ee";
+    this.fpClipDist = 1;
     this.enabled = false;
     this._group = new THREE.Group();
     this._target = new THREE.Group();
@@ -29,7 +31,7 @@ export default class TeleportVR {
       new THREE.Vector3(1, 3, -1),
       new THREE.Vector3(2, 0, -2)
     );
-    const _mesh = new THREE.Mesh(
+    this._mesh = new THREE.Mesh(
       new THREE.CylinderBufferGeometry(1, 1, 0.01, 8),
       new THREE.MeshBasicMaterial({
         color: 0x0044ff,
@@ -38,8 +40,8 @@ export default class TeleportVR {
         transparent: true,
       })
     );
-    _mesh.name = "helperTarget";
-    this._target.add(_mesh);
+    this._mesh.name = "helperTarget";
+    this._target.add(this._mesh);
     const _mesh2 = new THREE.Mesh(
       new THREE.BoxBufferGeometry(0.03, 0.03, 1),
       new THREE.MeshBasicMaterial({
@@ -102,18 +104,61 @@ export default class TeleportVR {
     this._visible = false;
     this._target.visible = false;
     this._curve.visible = false;
-    this._target.getWorldPosition(this._group.position);
-    this._target.getWorldQuaternion(this._group.quaternion);
+    const newPos = this._target.getWorldPosition(new THREE.Vector3());
+    const newOri = this._target.getWorldQuaternion(new THREE.Quaternion());
+    console.log();
+    if (
+      !window.firstPerson &&
+      newPos.distanceTo(window.robotGroup.position) < this.fpClipDist
+    ) {
+      this._group.position.copy(window.robotGroup.position);
+      const direction = new THREE.Vector3(0, 0, 1).applyQuaternion(
+        window.robotGroup.quaternion
+      );
+      this._group.rotation.y = Math.atan2(-direction.z, direction.x);
+      window.firstPerson = true;
+    } else {
+      window.firstPerson = false;
+      this._group.position.copy(newPos);
+      this._group.quaternion.copy(newOri);
+    }
   }
   set(pos) {
     this._group.position.copy(pos);
   }
+  setOri(ori) {
+    this._group.quaternion.copy(ori);
+  }
+
   setCamPos(pos) {
     this.set(
       pos.add(
         this._group.position.clone().addScaledVector(window.camera.position, -1)
       )
     );
+  }
+
+  controlStart(gp) {
+    if (this.controlScheme == "hold") {
+      if (gp.buttons[4].pressed) {
+        this.settingTeleport = true;
+      }
+      return gp.buttons[4].pressed;
+    } else {
+      return gp.buttons[4].touched && !gp.buttons[4].pressed;
+    }
+  }
+
+  controlEnd(gp) {
+    if (this.controlScheme == "hold") {
+      if (this.settingTeleport && !gp.buttons[4].pressed) {
+        this.settingTeleport = false;
+        return true;
+      }
+      return false;
+    } else {
+      return gp.buttons[4].pressed;
+    }
   }
 
   update(elevationsMeshList) {
@@ -139,7 +184,7 @@ export default class TeleportVR {
     if (Object.keys(this._gamePads).length > 0) {
       for (let key in Object.keys(this._gamePads)) {
         const gp = this._gamePads[key];
-        if (gp.buttons[3].touched && !gp.buttons[3].pressed) {
+        if (this.controlStart(gp)) {
           //console.log("hapticActuators = " + gp.hapticActuators)
           //console.log(gp.axes[0] + " " + gp.axes[1] + " " + gp.axes[2] + " " + gp.axes[3])
           this._activeController = this._controllers[key];
@@ -147,7 +192,7 @@ export default class TeleportVR {
           this._visible = true;
           if (this.rotationScheme == "ee") {
             let goal = window.goalEERelThree
-              .getWorldPosition(new T.Vector3())
+              .getWorldPosition(new THREE.Vector3())
               .clone();
             goal.y = 0;
             this._target.lookAt(goal);
@@ -162,8 +207,11 @@ export default class TeleportVR {
           this._curve.visible = true;
           break;
         } else {
-          if (this._activeControllerKey === key && gp.buttons[3].pressed) {
+          if (this._activeControllerKey === key && this.controlEnd(gp)) {
             this._activeControllerKey = "";
+            this._target.position.y = -this._target.getWorldPosition(
+              new THREE.Vector3()
+            ).y;
             this.teleport();
             this._target.rotation.y = 0;
           } else if (this._activeControllerKey === key) {
@@ -192,6 +240,18 @@ export default class TeleportVR {
           this._target.position.y =
             intersects[0].point.y - this._group.position.y;
         }
+      }
+      this._target.position.y = -this._target.getWorldPosition(
+        new THREE.Vector3()
+      ).y;
+      const absPos = this._target.getWorldPosition(new THREE.Vector3());
+      if (
+        !window.firstPerson &&
+        absPos.distanceTo(window.robotGroup.position) < this.fpClipDist
+      ) {
+        this._mesh.material.color.setHex(0xffff44);
+      } else {
+        this._mesh.material.color.setHex(0x0044ff);
       }
       this._vectorArray.v0.copy(this._target.position);
       this._vectorArray.v2.copy(this._activeController.position);
