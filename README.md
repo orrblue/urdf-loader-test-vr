@@ -25,6 +25,10 @@ npm run build
 
 Note that `npm run build` must be executed everytime changes are made to the code.
 
+For development, Android Debug Bridge (adb) must be installed. 
+
+Then, follow the instructions below linked [here](https://github.com/kjoseph8/urdf-loader-test-vr#debugging-from-the-quest)
+
 ## New Additions
 
 ### Drawing Task
