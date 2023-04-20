@@ -11,7 +11,11 @@ git submodule init
 git submodule update
 ```
 
-Then follow the instructions [here](https://github.com/uwgraphics/relaxed_ik_core/tree/151edc9d14c2e59a6c197f0ce74ae569224c36b8). Finally, run the following commands:
+Then, follow the instructions [here](https://github.com/uwgraphics/relaxed_ik_core/tree/ranged-ik#javascript-webassembly-wrapper) to install dependencies (e.g. Rust) of the relaxed_ik submodule. 
+
+Then, if you need to instal Node.js: install the latest LTS version of Node.js (18.16.0 at time of writing) using [nvm](https://github.com/nvm-sh/nvm) (recommended) or the [Node.js installer](https://nodejs.org/en/download)
+
+Finally, run the following commands:
 
 ```console
 npm install
