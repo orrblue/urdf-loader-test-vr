@@ -264,17 +264,22 @@ export default class Control {
       let right_gp = this.controller.get("right").gamepad;
       if (right_gp) {
         window.robotGroup.rotateY(
-          (-right_gp.axes[2] * window.deltaTime) / 5000
+          (-right_gp.axes[2] * window.deltaTime) / 2500
         );
       }
 
       let left_gp = this.controller.get("left").gamepad;
       if (left_gp) {
         let direction = new T.Vector3(
-          -left_gp.axes[3],
+          left_gp.axes[3],
           0,
-          left_gp.axes[2]
+          -left_gp.axes[2]
         ).normalize();
+        const camDirection = new T.Vector3(0, 0, 1).applyQuaternion(
+          window.camera.quaternion
+        );
+        const yRot = Math.atan2(-camDirection.z, camDirection.x);
+        direction.applyEuler(new T.Euler(0, yRot, 0));
         window.robotGroup.translateX((direction.x * window.deltaTime) / 5000);
         window.robotGroup.translateZ((direction.z * window.deltaTime) / 5000);
       }
