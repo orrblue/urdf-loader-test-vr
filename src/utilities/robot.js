@@ -32,24 +32,22 @@ export function computeGripper(eePose) {
 }
 
 export function getCurrEEPose() {
-  let posi = window.robotGroup.position.clone();
-  let ori = window.robotGroup.quaternion.clone();
-  let link = null;
   if (window.robotName == "sawyer") {
-    link = window.robot.links.right_hand;
+    return {
+      posi: window.robot.links.right_hand.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.right_hand.getWorldQuaternion(new T.Quaternion()),
+    };
   } else if (window.robotName == "ur5") {
-    link = window.robot.links.finger_tip;
-  } else if (window.robotName == "spot") {
-    link = window.robot.links.gripper;
+    return {
+      posi: window.robot.links.finger_tip.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.finger_tip.getWorldQuaternion(new T.Quaternion()),
+    };
+  } else {
+    return {
+      posi: window.robot.links.gripper.getWorldPosition(new T.Vector3()),
+      ori: window.robot.links.gripper.getWorldQuaternion(new T.Quaternion()),
+    };
   }
-  if (link) {
-    posi.add(link.getWorldPosition(new T.Vector3()).applyQuaternion(ori));
-    ori.multiply(link.getWorldQuaternion(new T.Quaternion()));
-  }
-  return {
-    posi: posi,
-    ori: ori,
-  };
 }
 
 export function getGripperPose(tip = false) {

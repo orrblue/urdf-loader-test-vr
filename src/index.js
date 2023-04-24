@@ -151,7 +151,6 @@ function loadRobot(
 
                 const visualGroup = new T.Group();
                 visualGroup.add(urdfVisual);
-                window.robots[name].robotGroup.add(visualGroup);
                 window.robots[name].robotObjs.set(rigidBody, visualGroup);
               }
 
@@ -256,7 +255,6 @@ function loadRobot(
 
           const visualGroup = new T.Group();
           visualGroup.add(urdfVisual);
-          window.robots[name].robotGroup.add(visualGroup);
         }
       }
 
@@ -282,9 +280,14 @@ window.setRobot = (name) => {
   window.robotObjs.forEach((visualGroup, rigidBody) =>
     window.simObjs.delete(visualGroup)
   );
+  window.robotObjs.forEach((visualGroup, rigidBody) =>
+    scene.remove(visualGroup)
+  );
   window.robotGroup.remove(window.initEEAbsThree);
+  window.robotGroup.remove(window.robot);
   scene.remove(window.robotGroup);
   window.robot = window.robots[name].robot;
+  window.robot.visible = false;
   window.robotName = window.robots[name].robotName;
   window.robotColliders = window.robots[name].robotColliders;
   window.gripperColliders = window.robots[name].gripperColliders;
@@ -295,8 +298,10 @@ window.setRobot = (name) => {
   window.robotGroup = window.robots[name].robotGroup;
   window.leftFinger = window.robots[name].leftFinger;
   window.rightFinger = window.robots[name].rightFinger;
-  scene.add(window.robotGroup);
+  window.robotGroup.add(window.robot);
   window.robotGroup.add(window.initEEAbsThree);
+  scene.add(window.robotGroup);
+  window.robotObjs.forEach((visualGroup, rigidBody) => scene.add(visualGroup));
   window.robotObjs.forEach((visualGroup, rigidBody) =>
     window.simObjs.set(rigidBody, visualGroup)
   );
@@ -327,6 +332,8 @@ ground.setCollisionGroups(groundCollisionGroups);
 
 window.robotObjs = new Map();
 window.robotGroup = new T.Group();
+window.robot = new T.Group();
+window.robotGroup.add(window.robot);
 window.simObjs = new Map();
 window.robots = {};
 
