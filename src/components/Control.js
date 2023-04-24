@@ -256,7 +256,8 @@ export default class Control {
       const direction = new T.Vector3(0, 0, 1).applyQuaternion(
         window.camera.quaternion
       );
-      window.robotGroup.rotation.y = Math.atan2(direction.z, -direction.x);
+      window.robotGroup.rotation.y =
+        Math.atan2(-direction.z, direction.x) + Math.PI;
       window.robotGroup.position.z = window.camera.position.z;
       window.robotGroup.translateX(-0.15);
     } else {

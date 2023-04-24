@@ -85,8 +85,7 @@ export default class Erasing extends Task {
               if (posi.x > 0.4) {
                 posi.x = 0.4;
               }
-              direction.multiplyScalar(-1);
-              posi.add(direction);
+              posi.sub(direction);
             }
           }
         }
@@ -255,8 +254,7 @@ export default class Erasing extends Task {
             if (posi.x > 1) {
               posi.x = 1;
             }
-            direction.multiplyScalar(-1);
-            posi.add(direction);
+            posi.sub(direction);
           }
         }
       }

@@ -118,7 +118,7 @@ export function updateRobot() {
 export function resetRobot() {
   window.firstPerson = false;
   window.teleportvr.set(new T.Vector3(0.25, 0, 0.5));
-  window.teleportvr.setOri(new T.Quaternion().identity());
+  window.teleportvr._group.rotation.y = 0;
   window.robotGroup.position.x = 0;
   window.robotGroup.position.z = 0;
   window.robotGroup.quaternion.copy(new T.Quaternion().identity());

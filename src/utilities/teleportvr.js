@@ -119,23 +119,26 @@ export default class TeleportVR {
       window.firstPerson = true;
     } else {
       window.firstPerson = false;
-      this._group.position.copy(newPos);
-      this._group.quaternion.copy(newOri);
+      const yPos = this._group.position.y;
+      this.setCamPos(newPos);
+      this._group.position.y = yPos;
+      newOri.multiply(
+        window.camera.quaternion
+          .clone()
+          .multiply(this._group.quaternion.clone().invert())
+          .invert()
+      );
+      const direction = new THREE.Vector3(0, 0, 1).applyQuaternion(newOri);
+      this._group.rotation.y =
+        Math.atan2(-direction.z, direction.x) + Math.PI / 2;
     }
   }
   set(pos) {
     this._group.position.copy(pos);
   }
-  setOri(ori) {
-    this._group.quaternion.copy(ori);
-  }
 
   setCamPos(pos) {
-    this.set(
-      pos.add(
-        this._group.position.clone().addScaledVector(window.camera.position, -1)
-      )
-    );
+    this.set(pos.sub(window.camera.position.clone().sub(this._group.position)));
   }
 
   controlStart(gp) {

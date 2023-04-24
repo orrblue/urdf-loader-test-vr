@@ -106,8 +106,7 @@ export default class Drawing extends Task {
           if (posi.x > 0.38) {
             posi.x = 0.38;
           }
-          direction.multiplyScalar(-1);
-          posi.add(direction);
+          posi.sub(direction);
         }
 
         return {
