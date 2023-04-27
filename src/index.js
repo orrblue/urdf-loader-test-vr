@@ -108,6 +108,7 @@ function loadRobot(
         window.robots[name].urdf
       );
       console.log("%cSuccessfully loaded robot config.", "color: green");
+      console.log("Nitzan 3 test");
 
       window.robots[name].linkToRigidBody = new Map();
       window.robots[name].robotObjs = new Map();

@@ -140,6 +140,8 @@ export default class TeleportVR {
 
   controlStart(gp) {
     if (this.controlScheme == "hold") {
+      console.log("GP2: " + gp);
+      console.log("GP2.buttons: " + gp.buttons);
       if (gp.buttons[4].pressed) {
         this.settingTeleport = true;
       }
@@ -184,6 +186,13 @@ export default class TeleportVR {
     if (Object.keys(this._gamePads).length > 0) {
       for (let key in Object.keys(this._gamePads)) {
         const gp = this._gamePads[key];
+        console.log("GP 1 = " + gp);
+        //console.log("GP 1 buttons = " + gp.buttons + " " + gp.buttons.length);
+        // if length of gp.buttons < 2, then it's not a valid gamepad
+        if ( !gp || gp.buttons.length < 2) {
+          console.log("please reconnect controllers rather than using hand recognition");
+          continue;
+        }
         if (this.controlStart(gp)) {
           //console.log("hapticActuators = " + gp.hapticActuators)
           //console.log(gp.axes[0] + " " + gp.axes[1] + " " + gp.axes[2] + " " + gp.axes[3])
