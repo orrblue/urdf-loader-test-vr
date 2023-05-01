@@ -76,6 +76,9 @@ function loadRobot(
     window.robots[name] = {};
     window.robots[name].robot = robot;
     window.robots[name].robotName = name;
+    window.robots[name].robotGroup = new T.Group();
+    window.robots[name].robot.visible = false;
+    window.robots[name].robotGroup.add(window.robots[name].robot);
 
     window.robots[name].robotColliders = {};
     window.robots[name].gripperColliders = [];
@@ -111,7 +114,6 @@ function loadRobot(
 
       window.robots[name].linkToRigidBody = new Map();
       window.robots[name].robotObjs = new Map();
-      window.robots[name].robotGroup = new T.Group();
 
       function initRobotPhysics(currJoint) {
         if (
@@ -255,6 +257,7 @@ function loadRobot(
 
           const visualGroup = new T.Group();
           visualGroup.add(urdfVisual);
+          window.robots[name].robotObjs.set(rigidBody, visualGroup);
         }
       }
 
@@ -284,10 +287,8 @@ window.setRobot = (name) => {
     scene.remove(visualGroup)
   );
   window.robotGroup.remove(window.initEEAbsThree);
-  window.robotGroup.remove(window.robot);
   scene.remove(window.robotGroup);
   window.robot = window.robots[name].robot;
-  window.robot.visible = false;
   window.robotName = window.robots[name].robotName;
   window.robotColliders = window.robots[name].robotColliders;
   window.gripperColliders = window.robots[name].gripperColliders;
@@ -298,7 +299,6 @@ window.setRobot = (name) => {
   window.robotGroup = window.robots[name].robotGroup;
   window.leftFinger = window.robots[name].leftFinger;
   window.rightFinger = window.robots[name].rightFinger;
-  window.robotGroup.add(window.robot);
   window.robotGroup.add(window.initEEAbsThree);
   scene.add(window.robotGroup);
   window.robotObjs.forEach((visualGroup, rigidBody) => scene.add(visualGroup));
@@ -362,18 +362,23 @@ window.firstPerson = false;
 const robots = {
   sawyer: {
     config:
-      "https://raw.githubusercontent.com/yepw/robot_configs/master/relaxed_ik_web_demo/settings/sawyer.yaml",
-    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer_description/urdf/sawyer_gripper.urdf",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer/sawyer.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer/urdf/sawyer_gripper.urdf",
   },
   ur5: {
     config:
-      "https://raw.githubusercontent.com/yepw/robot_configs/master/relaxed_ik_web_demo/settings/ur5.yaml",
-    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/urdf/ur5_gripper.urdf",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5/ur5.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5/urdf/ur5_gripper.urdf",
   },
-  spot: {
+  spotArm: {
     config:
-      "https://raw.githubusercontent.com/yepw/robot_configs/master/relaxed_ik_web_demo/settings/spot_arm.yaml",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/spot_arm.yaml",
     urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/urdf/spot_arm.urdf",
+  },
+  mobileSpotArm: {
+    config:
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/mobile_spot_arm/mobile_spot_arm.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/mobile_spot_arm/urdf/mobile_spot_arm.urdf",
   },
 };
 
@@ -385,7 +390,7 @@ getURDFFromURL(robots.sawyer.urdf, (blob) => {
     robots.sawyer.config,
     robots.sawyer.urdf,
     true,
-    true
+    false
   );
 });
 
@@ -401,15 +406,27 @@ getURDFFromURL(robots.ur5.urdf, (blob) => {
   );
 });
 
-getURDFFromURL(robots.spot.urdf, (blob) => {
-  robots.spot.file = URL.createObjectURL(blob);
+getURDFFromURL(robots.spotArm.urdf, (blob) => {
+  robots.spotArm.file = URL.createObjectURL(blob);
   loadRobot(
-    "spot",
-    robots.spot.file,
-    robots.spot.config,
-    robots.spot.urdf,
+    "spotArm",
+    robots.spotArm.file,
+    robots.spotArm.config,
+    robots.spotArm.urdf,
     true,
     false
+  );
+});
+
+getURDFFromURL(robots.mobileSpotArm.urdf, (blob) => {
+  robots.mobileSpotArm.file = URL.createObjectURL(blob);
+  loadRobot(
+    "mobileSpotArm",
+    robots.mobileSpotArm.file,
+    robots.mobileSpotArm.config,
+    robots.mobileSpotArm.urdf,
+    true,
+    true
   );
 });
 
