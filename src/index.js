@@ -362,23 +362,23 @@ window.firstPerson = false;
 const robots = {
   sawyer: {
     config:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer/sawyer.yaml",
-    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer/urdf/sawyer_gripper.urdf",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer_description/sawyer.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/sawyer_description/urdf/sawyer_gripper.urdf",
   },
   ur5: {
     config:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5/ur5.yaml",
-    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5/urdf/ur5_gripper.urdf",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/ur5.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/ur5_description/urdf/ur5_gripper.urdf",
   },
   spotArm: {
     config:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/spot_arm.yaml",
-    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm/urdf/spot_arm.urdf",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm_description/spot_arm.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/spot_arm_description/urdf/spot_arm.urdf",
   },
   mobileSpotArm: {
     config:
-      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/mobile_spot_arm/mobile_spot_arm.yaml",
-    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/mobile_spot_arm/urdf/mobile_spot_arm.urdf",
+      "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/mobile_spot_arm_description/mobile_spot_arm.yaml",
+    urdf: "https://raw.githubusercontent.com/kjoseph8/urdf-loader-test-vr/master/robot_descriptions/mobile_spot_arm_description/urdf/mobile_spot_arm.urdf",
   },
 };
 
