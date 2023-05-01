@@ -169,7 +169,7 @@ export default class TeleportVR {
       this.setCamPos(
         new THREE.Vector3(
           window.camera.position.x,
-          1.5,
+          window.fpCamOffset.y,
           window.camera.position.z
         )
       );

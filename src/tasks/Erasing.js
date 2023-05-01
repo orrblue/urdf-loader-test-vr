@@ -219,16 +219,28 @@ export default class Erasing extends Task {
       let pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
-      let correctionRot = new T.Quaternion(
-        Math.sin(-Math.PI / 4),
-        0,
-        0,
-        Math.cos(-Math.PI / 4)
-      );
+      let correctionRot = new T.Quaternion();
+      if (window.robotName == "sawyer") {
+        correctionRot = new T.Quaternion(
+          Math.sin(-Math.PI / 4),
+          0,
+          0,
+          Math.cos(-Math.PI / 4)
+        );
+      } else {
+        correctionRot = new T.Quaternion(
+          Math.sin(Math.PI / 2),
+          0,
+          0,
+          Math.cos(Math.PI / 2)
+        );
+      }
       ori.multiply(correctionRot);
       let correctionTrans = new T.Vector3(0, 0, 0);
       if (window.robotName == "sawyer") {
         correctionTrans.y = -0.15;
+      } else {
+        correctionTrans.y = -0.25;
       }
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);

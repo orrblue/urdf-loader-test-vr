@@ -80,46 +80,19 @@ export default class Control {
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
-          setRobot: "sawyer",
           trace: "ros",
           text: "Sawyer Drawing.\n\n",
         }
       ),
-      /*
-      await Drawing.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          setRobot: "ur5",
-          trace: "ros",
-          text: "ur5 drawing.\n\n",
-        }
-      ),
-      */
       await Erasing.init(
         utilities,
         new Condition("redirected-control-only", [
           new DragControl(utilities, { controlMode: "grip-toggle" }),
         ]),
         {
-          setRobot: "sawyer",
           text: "Sawyer Erasing.\n\n",
         }
       ),
-      /*
-      await Erasing.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
-        {
-          setRobot: "ur5",
-          text: "ur5 erasing.\n\n",
-        }
-      ),
-      */
       await Drawing.init(
         utilities,
         new Condition("redirected-control-only", [
@@ -259,7 +232,7 @@ export default class Control {
       window.robotGroup.rotation.y =
         Math.atan2(-direction.z, direction.x) + Math.PI;
       window.robotGroup.position.z = window.camera.position.z;
-      window.robotGroup.translateX(-0.15);
+      window.robotGroup.translateX(window.fpCamOffset.x);
     } else {
       let right_gp = this.controller.get("right").gamepad;
       if (right_gp) {
@@ -280,8 +253,8 @@ export default class Control {
         );
         const yRot = Math.atan2(-camDirection.z, camDirection.x);
         direction.applyEuler(new T.Euler(0, yRot, 0));
-        window.robotGroup.translateX((direction.x * window.deltaTime) / 5000);
-        window.robotGroup.translateZ((direction.z * window.deltaTime) / 5000);
+        window.robotGroup.position.x += (direction.x * window.deltaTime) / 5000;
+        window.robotGroup.position.z += (direction.z * window.deltaTime) / 5000;
       }
     }
 

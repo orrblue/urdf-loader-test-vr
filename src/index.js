@@ -27,7 +27,9 @@ function loadRobot(
   config_link,
   urdf_link,
   loadScreen = false,
-  init = false
+  init = false,
+  defaultPosi = new T.Vector3(0.2, 0.05, 0),
+  fpCamOffset = new T.Vector3(-0.15, 1.5, 0)
 ) {
   const loader = new URDFLoader(
     loadScreen
@@ -49,9 +51,7 @@ function loadRobot(
 
   loader.load(file, (robot) => {
     robot.rotation.x = -Math.PI / 2;
-    robot.position.y = 0.05;
-    robot.position.x = 0.2;
-    // robot.position.z = .3;
+    robot.position.copy(defaultPosi);
     robot.updateMatrix();
 
     robot.traverse((c) => {
@@ -79,6 +79,7 @@ function loadRobot(
     window.robots[name].robotGroup = new T.Group();
     window.robots[name].robot.visible = false;
     window.robots[name].robotGroup.add(window.robots[name].robot);
+    window.robots[name].fpCamOffset = fpCamOffset;
 
     window.robots[name].robotColliders = {};
     window.robots[name].gripperColliders = [];
@@ -257,7 +258,9 @@ function loadRobot(
 
           const visualGroup = new T.Group();
           visualGroup.add(urdfVisual);
-          window.robots[name].robotObjs.set(rigidBody, visualGroup);
+          visualGroup.rotateX(-Math.PI / 2);
+          visualGroup.position.copy(defaultPosi);
+          window.robots[name].robotGroup.add(visualGroup);
         }
       }
 
@@ -286,10 +289,11 @@ window.setRobot = (name) => {
   window.robotObjs.forEach((visualGroup, rigidBody) =>
     scene.remove(visualGroup)
   );
-  window.robotGroup.remove(window.initEEAbsThree);
   scene.remove(window.robotGroup);
+  window.robotGroup.remove(window.initEEAbsThree);
   window.robot = window.robots[name].robot;
   window.robotName = window.robots[name].robotName;
+  window.fpCamOffset = window.robots[name].fpCamOffset;
   window.robotColliders = window.robots[name].robotColliders;
   window.gripperColliders = window.robots[name].gripperColliders;
   window.robotConfigs = window.robots[name].configs;
@@ -390,7 +394,9 @@ getURDFFromURL(robots.sawyer.urdf, (blob) => {
     robots.sawyer.config,
     robots.sawyer.urdf,
     true,
-    false
+    false,
+    new T.Vector3(0.2, 0.05, 0),
+    new T.Vector3(-0.15, 1.5, 0)
   );
 });
 
@@ -402,7 +408,9 @@ getURDFFromURL(robots.ur5.urdf, (blob) => {
     robots.ur5.config,
     robots.ur5.urdf,
     true,
-    false
+    false,
+    new T.Vector3(0.2, 0.05, 0),
+    new T.Vector3(-0.15, 1.5, 0)
   );
 });
 
@@ -414,7 +422,9 @@ getURDFFromURL(robots.spotArm.urdf, (blob) => {
     robots.spotArm.config,
     robots.spotArm.urdf,
     true,
-    false
+    true,
+    new T.Vector3(0.2, 0.5, 0),
+    new T.Vector3(-0.3, 1.2, 0)
   );
 });
 
@@ -426,7 +436,9 @@ getURDFFromURL(robots.mobileSpotArm.urdf, (blob) => {
     robots.mobileSpotArm.config,
     robots.mobileSpotArm.urdf,
     true,
-    true
+    false,
+    new T.Vector3(0.2, 0.5, 0),
+    new T.Vector3(-0.3, 1.2, 0)
   );
 });
 
@@ -439,8 +451,7 @@ async function someInit(name) {
   };
 
   document.querySelector("#toggle-robot").onclick = function () {
-    if (window.robot.parent === scene) scene.remove(window.robot);
-    else scene.add(window.robot);
+    window.robot.visible = !window.robot.visible;
   };
 
   const data = new Data();
