@@ -18,6 +18,7 @@ export default class Task {
     this.numRounds = options.numRounds ?? NUM_ROUNDS;
     this.resetAfterTrial = options.resetAfterTrial ?? true;
     this.text = options.text ?? undefined;
+    this.robot = options.robot ?? "";
 
     //
 
@@ -62,6 +63,10 @@ export default class Task {
       ],
       methods: {
         onStart: (state) => {
+          if (this.robot != "") {
+            window.setRobot(this.robot);
+          }
+          resetRobot();
           that.onStart();
           that.condition.load();
           that.setRound(Number(state.to));

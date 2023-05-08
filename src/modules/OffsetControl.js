@@ -19,11 +19,11 @@ export class OffsetControl extends Module {
     config.transitions.push({
       name: "activateRemoteControl",
       from: "IDLE",
-      to: "REMOTE_CONTROL",
+      to: "OFFSET_CONTROL",
     });
     config.transitions.push({
       name: "deactivateRemoteControl",
-      from: "REMOTE_CONTROL",
+      from: "OFFSET_CONTROL",
       to: "IDLE",
     });
     config.methods["onActivateRemoteControl"] = () => {
@@ -61,7 +61,7 @@ export class OffsetControl extends Module {
         });
 
         this.controller.addButtonAction("gripend", "remote-control", () => {
-          if (this.fsm.is("REMOTE_CONTROL")) this.fsm.deactivateRemoteControl();
+          if (this.fsm.is("OFFSET_CONTROL")) this.fsm.deactivateRemoteControl();
         });
         this.modeInstructions =
           "Activate: Press and hold the grip button.\nDeactivate: Release the grip button.";
@@ -70,7 +70,7 @@ export class OffsetControl extends Module {
         this.controller.addButtonAction("grip", "remote-control", () => {
           if (this.fsm.is("IDLE")) {
             this.fsm.activateRemoteControl();
-          } else if (this.fsm.is("REMOTE_CONTROL")) {
+          } else if (this.fsm.is("OFFSET_CONTROL")) {
             this.fsm.deactivateRemoteControl();
           }
         });
@@ -87,7 +87,7 @@ export class OffsetControl extends Module {
         );
 
         this.controller.addButtonAction("triggerend", "remote-control", () => {
-          if (this.fsm.is("REMOTE_CONTROL")) this.fsm.deactivateRemoteControl();
+          if (this.fsm.is("OFFSET_CONTROL")) this.fsm.deactivateRemoteControl();
         });
         this.modeInstructions =
           "Activate: Squeeze and hold the trigger.\nDeactivate: Release the trigger.";
@@ -96,7 +96,7 @@ export class OffsetControl extends Module {
         this.controller.addButtonAction("trigger", "remote-control", () => {
           if (this.fsm.is("IDLE")) {
             this.fsm.activateRemoteControl();
-          } else if (this.fsm.is("REMOTE_CONTROL")) {
+          } else if (this.fsm.is("OFFSET_CONTROL")) {
             this.fsm.deactivateRemoteControl();
           }
         });
@@ -109,7 +109,7 @@ export class OffsetControl extends Module {
   }
 
   reset() {
-    if (this.fsm.is("REMOTE_CONTROL")) this.fsm.deactivateRemoteControl();
+    if (this.fsm.is("OFFSET_CONTROL")) this.fsm.deactivateRemoteControl();
   }
 
   update(t, info) {
@@ -121,7 +121,7 @@ export class OffsetControl extends Module {
     ori.multiply(this.offset);
     window.goalEERelThree.quaternion.copy(ori);
 
-    if (this.fsm.is("REMOTE_CONTROL")) {
+    if (this.fsm.is("OFFSET_CONTROL")) {
       const deltaPosi = new T.Vector3();
       deltaPosi.subVectors(info.ctrlPose.posi, info.prevCtrlPose.posi);
       deltaPosi.applyQuaternion(window.robotGroup.quaternion.clone().invert());

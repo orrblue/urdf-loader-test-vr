@@ -10,6 +10,7 @@ export default class TeleportVR {
   constructor(scene, camera) {
     this.controlScheme = "hold";
     this.settingTeleport = false;
+    this.settingFPCameraLock = false;
     this.rotationScheme = "ee";
     this.fpClipDist = 1;
     this.enabled = false;
@@ -142,6 +143,10 @@ export default class TeleportVR {
   }
 
   controlStart(gp) {
+    if (gp.buttons[5].pressed) {
+      this.settingFPCameraLock = true;
+    }
+
     if (this.controlScheme == "hold") {
       if (gp.buttons[4].pressed) {
         this.settingTeleport = true;
@@ -153,6 +158,11 @@ export default class TeleportVR {
   }
 
   controlEnd(gp) {
+    if (this.settingFPCameraLock && !gp.buttons[5].pressed) {
+      this.settingFPCameraLock = false;
+      window.fpLockedCamera = !window.fpLockedCamera;
+    }
+
     if (this.controlScheme == "hold") {
       if (this.settingTeleport && !gp.buttons[4].pressed) {
         this.settingTeleport = false;
@@ -166,13 +176,25 @@ export default class TeleportVR {
 
   update(elevationsMeshList) {
     if (window.firstPerson) {
-      this.setCamPos(
-        new THREE.Vector3(
-          window.camera.position.x,
-          window.fpCamOffset.y,
-          window.camera.position.z
-        )
-      );
+      if (window.fpLockedCamera) {
+        let offset = new THREE.Vector3(window.fpCamOffset.x, 0, 0);
+        offset.applyQuaternion(window.robotGroup.quaternion);
+        this.setCamPos(
+          new THREE.Vector3(
+            window.robotGroup.position.x,
+            window.fpCamOffset.y,
+            window.robotGroup.position.z
+          ).add(offset)
+        );
+      } else {
+        this.setCamPos(
+          new THREE.Vector3(
+            window.camera.position.x,
+            window.fpCamOffset.y,
+            window.camera.position.z
+          )
+        );
+      }
     }
 
     if (
@@ -184,46 +206,44 @@ export default class TeleportVR {
       return;
     }
 
-    if (Object.keys(this._gamePads).length > 0) {
-      for (let key in Object.keys(this._gamePads)) {
-        const gp = this._gamePads[key];
-        if (this.controlStart(gp)) {
-          //console.log("hapticActuators = " + gp.hapticActuators)
-          //console.log(gp.axes[0] + " " + gp.axes[1] + " " + gp.axes[2] + " " + gp.axes[3])
-          this._activeController = this._controllers[key];
-          this._activeControllerKey = key;
-          this._visible = true;
-          if (this.rotationScheme == "ee") {
-            let goal = window.goalEERelThree
-              .getWorldPosition(new THREE.Vector3())
-              .clone();
-            goal.y = 0;
-            this._target.lookAt(goal);
-            this._target.rotateY(Math.PI);
-          } else if (
-            this.rotationScheme == "default" &&
-            Math.abs(gp.axes[2]) + Math.abs(gp.axes[3]) > 0.25
-          ) {
-            this._target.rotation.y = Math.atan2(-gp.axes[2], -gp.axes[3]); //angle degrees
-          }
-          this._target.visible = true;
-          this._curve.visible = true;
-          break;
-        } else {
-          if (this._activeControllerKey === key && this.controlEnd(gp)) {
-            this._activeControllerKey = "";
-            this._target.position.y = -this._target.getWorldPosition(
-              new THREE.Vector3()
-            ).y;
-            this.teleport();
-            this._target.rotation.y = 0;
-          } else if (this._activeControllerKey === key) {
-            this._activeControllerKey = "";
-            this._visible = false;
-            this._target.visible = false;
-            this._curve.visible = false;
-            this._target.rotation.y = 0;
-          }
+    if (Object.keys(this._gamePads).length > 1) {
+      const key = 1;
+      const gp = this._gamePads[key];
+      if (this.controlStart(gp)) {
+        //console.log("hapticActuators = " + gp.hapticActuators)
+        //console.log(gp.axes[0] + " " + gp.axes[1] + " " + gp.axes[2] + " " + gp.axes[3])
+        this._activeController = this._controllers[key];
+        this._activeControllerKey = key;
+        this._visible = true;
+        if (this.rotationScheme == "ee") {
+          let goal = window.goalEERelThree
+            .getWorldPosition(new THREE.Vector3())
+            .clone();
+          goal.y = 0;
+          this._target.lookAt(goal);
+          this._target.rotateY(Math.PI);
+        } else if (
+          this.rotationScheme == "default" &&
+          Math.abs(gp.axes[2]) + Math.abs(gp.axes[3]) > 0.25
+        ) {
+          this._target.rotation.y = Math.atan2(-gp.axes[2], -gp.axes[3]); //angle degrees
+        }
+        this._target.visible = true;
+        this._curve.visible = true;
+      } else {
+        if (this.controlEnd(gp) && this._activeControllerKey === key) {
+          this._activeControllerKey = "";
+          this._target.position.y = -this._target.getWorldPosition(
+            new THREE.Vector3()
+          ).y;
+          this.teleport();
+          this._target.rotation.y = 0;
+        } else if (this._activeControllerKey === key) {
+          this._activeControllerKey = "";
+          this._visible = false;
+          this._target.visible = false;
+          this._curve.visible = false;
+          this._target.rotation.y = 0;
         }
       }
     }

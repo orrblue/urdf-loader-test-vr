@@ -361,6 +361,7 @@ window.adjustedControl = (goal) => {
 };
 
 window.firstPerson = false;
+window.fpLockedCamera = false;
 
 // load robot
 const robots = {
@@ -396,7 +397,7 @@ getURDFFromURL(robots.sawyer.urdf, (blob) => {
     true,
     false,
     new T.Vector3(0.2, 0.05, 0),
-    new T.Vector3(-0.15, 1.5, 0)
+    new T.Vector3(0.15, 1.5, 0)
   );
 });
 
@@ -410,7 +411,7 @@ getURDFFromURL(robots.ur5.urdf, (blob) => {
     true,
     false,
     new T.Vector3(0.2, 0.05, 0),
-    new T.Vector3(-0.15, 1.5, 0)
+    new T.Vector3(0.15, 1.5, 0)
   );
 });
 
@@ -424,7 +425,7 @@ getURDFFromURL(robots.spotArm.urdf, (blob) => {
     true,
     true,
     new T.Vector3(0.2, 0.5, 0),
-    new T.Vector3(-0.3, 1.2, 0)
+    new T.Vector3(0.5, 1.2, 0)
   );
 });
 
@@ -438,7 +439,7 @@ getURDFFromURL(robots.mobileSpotArm.urdf, (blob) => {
     true,
     false,
     new T.Vector3(0.2, 0.5, 0),
-    new T.Vector3(-0.3, 1.2, 0)
+    new T.Vector3(0.5, 1.2, 0)
   );
 });
 

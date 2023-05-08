@@ -45,6 +45,9 @@ export default class Control {
     const pose = getCurrEEPose();
     window.initEEAbsThree.position.copy(pose.posi);
 
+    control.resettingTask = false;
+    control.switchingTask = false;
+
     // whether or not teleportation is enabled,
     // teleportvr is still initialized here because it is used to set the initial position of the user
     control.teleportvr = new TeleportVR(window.scene, control.camera);
@@ -68,75 +71,55 @@ export default class Control {
     };
 
     control.tasks = [
-      await DragControlTutorial.init(
+      await RemoteControlTutorial.init(
         utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ])
+        new Condition(
+          "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities
+        )
       ),
       await Drawing.init(
         utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
+        new Condition(
+          "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities
+        ),
         {
+          robot: "sawyer",
           trace: "ros",
           text: "Sawyer Drawing.\n\n",
         }
       ),
       await Erasing.init(
         utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ]),
+        new Condition(
+          "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities
+        ),
         {
           text: "Sawyer Erasing.\n\n",
         }
       ),
-      await Drawing.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, {
-            controlMode: "grip-toggle",
-            showOffsetIndicator: false,
-          }),
-        ]),
-        {
-          robotControl: false,
-          rotationBased: true,
-          trace: "lab",
-          curveScale: 0.75,
-          pointerSize: 0.001,
-          distFromWhiteboard: 0.025,
-          text: "Hand Drawing.\n\n",
-        }
-      ),
-      await Erasing.init(
-        utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, {
-            controlMode: "grip-toggle",
-            showOffsetIndicator: false,
-          }),
-        ]),
-        {
-          robotControl: false,
-          text: "Hand Erasing.\n\n",
-        }
-      ),
       await GraspingTutorial.init(
         utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ])
+        new Condition(
+          "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities,
+          true
+        )
       ),
       await Pouring.init(
         utilities,
-        new Condition("drag-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-          new Grasping(utilities, { controlMode: "trigger-toggle" }),
-        ]),
+        new Condition(
+          "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities,
+          true
+        ),
         {
           firstPerson: true,
           text: "Pouring Task.\n\n",
@@ -144,9 +127,11 @@ export default class Control {
       ),
       await End.init(
         utilities,
-        new Condition("redirected-control-only", [
-          new DragControl(utilities, { controlMode: "grip-toggle" }),
-        ])
+        new Condition(
+          "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities
+        )
       ),
     ];
 
@@ -203,28 +188,13 @@ export default class Control {
       control.fsm.start();
     });
 
-    // use the trigger on the other controller to reset the current trial
-    const i = control.controller.hand == "right" ? 0 : 1;
-    control.controller.controller[i].controller.addEventListener(
-      "select",
-      () => {
-        control.tasks[Number(control.fsm.state)].fsm.reset();
-      }
-    );
-
-    // use the gripper on the other controller to continue to the next trial
-    control.controller.controller[i].controller.addEventListener(
-      "squeeze",
-      () => {
-        control.tasks[Number(control.fsm.state)].fsm.next();
-      }
-    );
-
     return control;
   }
 
   update(t) {
-    if (window.firstPerson) {
+    let left_gp = this.controller.get("left").gamepad;
+    let right_gp = this.controller.get("right").gamepad;
+    if (window.firstPerson && !window.fpLockedCamera) {
       window.robotGroup.position.x = window.camera.position.x;
       const direction = new T.Vector3(0, 0, 1).applyQuaternion(
         window.camera.quaternion
@@ -232,16 +202,8 @@ export default class Control {
       window.robotGroup.rotation.y =
         Math.atan2(-direction.z, direction.x) + Math.PI;
       window.robotGroup.position.z = window.camera.position.z;
-      window.robotGroup.translateX(window.fpCamOffset.x);
+      window.robotGroup.translateX(-window.fpCamOffset.x);
     } else {
-      let right_gp = this.controller.get("right").gamepad;
-      if (right_gp) {
-        window.robotGroup.rotateY(
-          (-right_gp.axes[2] * window.deltaTime) / 2500
-        );
-      }
-
-      let left_gp = this.controller.get("left").gamepad;
       if (left_gp) {
         let direction = new T.Vector3(
           left_gp.axes[3],
@@ -255,6 +217,27 @@ export default class Control {
         direction.applyEuler(new T.Euler(0, yRot, 0));
         window.robotGroup.position.x += (direction.x * window.deltaTime) / 5000;
         window.robotGroup.position.z += (direction.z * window.deltaTime) / 5000;
+      }
+      if (right_gp) {
+        window.robotGroup.rotateY(
+          (window.fpDeltaOri = (-right_gp.axes[2] * window.deltaTime) / 2500)
+        );
+      }
+    }
+
+    if (left_gp) {
+      if (left_gp.buttons[4].pressed) {
+        this.resettingTask = true;
+      } else if (this.resettingTask) {
+        this.resettingTask = false;
+        this.tasks[Number(this.fsm.state)].fsm.reset();
+      }
+
+      if (left_gp.buttons[5].pressed) {
+        this.switchingTask = true;
+      } else if (this.switchingTask) {
+        this.switchingTask = false;
+        this.tasks[Number(this.fsm.state)].fsm.next();
       }
     }
 

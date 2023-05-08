@@ -5,6 +5,7 @@ import Eraser from "../objects/Eraser";
 import { getCurrEEPose } from "../utilities/robot";
 import erasePaths from "../utilities/erasePaths";
 import { SCRIBBLE } from "../utilities/sounds";
+import markerRotations from "../utilities/markerRotations";
 
 export default class Erasing extends Task {
   static async init(params, condition, options = {}) {
@@ -15,7 +16,6 @@ export default class Erasing extends Task {
     };
     task.debug = options.debug ?? true;
     task.robotControl = options.robotControl ?? true;
-    task.setRobot = options.setRobot ?? "";
     task.distFromWhiteboard = options.distFromWhiteboard ?? 0.05;
     task.eraseVibrationStrength = options.eraseVibrationStrength ?? 0;
     task.stopOnCollision = options.stopOnCollision ?? false;
@@ -64,10 +64,6 @@ export default class Erasing extends Task {
       rotation: new T.Euler(0, Math.PI, 0, "XYZ"),
     });
 
-    if (this.setRobot != "") {
-      window.setRobot(this.setRobot);
-    }
-
     if (this.robotControl) {
       window.adjustedControl = (goal) => {
         let posi = goal.position.clone();
@@ -96,6 +92,7 @@ export default class Erasing extends Task {
         };
       };
     } else {
+      window.robotGroup.visible = false;
       window.robotObjs.forEach(
         (visualGroup, rigidBody) => (visualGroup.visible = false)
       );
@@ -141,6 +138,7 @@ export default class Erasing extends Task {
       };
     };
 
+    window.robotGroup.visible = true;
     window.robotObjs.forEach(
       (visualGroup, rigidBody) => (visualGroup.visible = true)
     );
@@ -219,22 +217,7 @@ export default class Erasing extends Task {
       let pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
-      let correctionRot = new T.Quaternion();
-      if (window.robotName == "sawyer") {
-        correctionRot = new T.Quaternion(
-          Math.sin(-Math.PI / 4),
-          0,
-          0,
-          Math.cos(-Math.PI / 4)
-        );
-      } else {
-        correctionRot = new T.Quaternion(
-          Math.sin(Math.PI / 2),
-          0,
-          0,
-          Math.cos(Math.PI / 2)
-        );
-      }
+      const correctionRot = markerRotations[window.robotName];
       ori.multiply(correctionRot);
       let correctionTrans = new T.Vector3(0, 0, 0);
       if (window.robotName == "sawyer") {

@@ -124,4 +124,6 @@ export function resetRobot() {
   window.goalEERelThree.quaternion.copy(new T.Quaternion().identity());
   window.relaxedIK.reset([]);
   updateRobot();
+  const pose = getCurrEEPose();
+  window.initEEAbsThree.position.copy(pose.posi);
 }
