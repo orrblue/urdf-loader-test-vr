@@ -5,7 +5,7 @@ import Marker from "../objects/Marker";
 import { getCurrEEPose } from "../utilities/robot";
 import traces from "../utilities/traces";
 import { SCRIBBLE } from "../utilities/sounds";
-import markerRotations from "../utilities/markerRotations";
+import markerConfigs from "../utilities/markerConfigs";
 
 export default class Drawing extends Task {
   static async init(params, condition, options = {}) {
@@ -256,14 +256,13 @@ export default class Drawing extends Task {
       let pose = getCurrEEPose();
       posi.copy(pose.posi);
       ori.copy(pose.ori);
-      const correctionRot = markerRotations[window.robotName];
+      const correctionRot = markerConfigs.rotation[window.robotName];
       ori.multiply(correctionRot);
-      let correctionTrans = new T.Vector3(0, 0, 0);
-      if (window.robotName == "sawyer") {
-        correctionTrans.y = -0.2;
-      } else {
-        correctionTrans.y = -0.3;
-      }
+      let correctionTrans = new T.Vector3(
+        0,
+        markerConfigs.translation[window.robotName],
+        0
+      );
       correctionTrans.applyQuaternion(ori);
       posi.add(correctionTrans);
     } else {

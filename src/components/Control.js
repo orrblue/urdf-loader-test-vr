@@ -87,9 +87,8 @@ export default class Control {
           utilities
         ),
         {
-          robot: "sawyer",
           trace: "ros",
-          text: "Sawyer Drawing.\n\n",
+          text: "Drawing.\n\n",
         }
       ),
       await Erasing.init(
@@ -100,7 +99,8 @@ export default class Control {
           utilities
         ),
         {
-          text: "Sawyer Erasing.\n\n",
+          robot: "ur5",
+          text: "Erasing.\n\n",
         }
       ),
       await GraspingTutorial.init(
@@ -110,7 +110,10 @@ export default class Control {
           new RemoteControl(utilities, { controlMode: "grip-toggle" }),
           utilities,
           true
-        )
+        ),
+        {
+          robot: "sawyer",
+        }
       ),
       await Pouring.init(
         utilities,

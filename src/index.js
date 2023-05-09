@@ -410,8 +410,8 @@ getURDFFromURL(robots.ur5.urdf, (blob) => {
     robots.ur5.urdf,
     true,
     false,
-    new T.Vector3(0.2, 0.05, 0),
-    new T.Vector3(0.15, 1.5, 0)
+    new T.Vector3(0.2, 0.75, 0),
+    new T.Vector3(0.2, 1.5, 0)
   );
 });
 

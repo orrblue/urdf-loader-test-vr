@@ -17,4 +17,16 @@ const markerRotations = {
   ),
 };
 
-export default markerRotations;
+const markerTranslations = {
+  sawyer: -0.2,
+  ur5: -0.1,
+  spotArm: -0.3,
+  mobileSpotArm: -0.3,
+};
+
+const markerConfigs = {
+  rotation: markerRotations,
+  translation: markerTranslations,
+};
+
+export default markerConfigs;

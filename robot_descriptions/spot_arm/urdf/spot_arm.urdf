@@ -332,7 +332,7 @@
         </collision>
     </link>
     <joint name="front_left_hip_y" type="revolute">
-        <origin xyz="0.0 0.110945 0.0" rpy="0 1.3 0" />
+        <origin xyz="0.0 0.110945 0.0" rpy="0 1.0 0" />
         <axis xyz="0 1 0" />
         <parent link="front_left_hip" />
         <child link="front_left_upper_leg" />
@@ -351,7 +351,7 @@
         </collision>
     </link>
     <joint name="front_left_knee" type="revolute">
-        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.6 0" />
+        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.0 0" />
         <axis xyz="0 1 0" />
         <parent link="front_left_upper_leg" />
         <child link="front_left_lower_leg" />
@@ -389,7 +389,7 @@
         </collision>
     </link>
     <joint name="front_right_hip_y" type="revolute">
-        <origin xyz="0.0 -0.110945 0.0" rpy="0 1.3 0" />
+        <origin xyz="0.0 -0.110945 0.0" rpy="0 1.0 0" />
         <axis xyz="0 1 0" />
         <parent link="front_right_hip" />
         <child link="front_right_upper_leg" />
@@ -408,7 +408,7 @@
         </collision>
     </link>
     <joint name="front_right_knee" type="revolute">
-        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.6 0" />
+        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.0 0" />
         <axis xyz="0 1 0" />
         <parent link="front_right_upper_leg" />
         <child link="front_right_lower_leg" />
@@ -446,7 +446,7 @@
         </collision>
     </link>
     <joint name="rear_left_hip_y" type="revolute">
-        <origin xyz="0.0 0.110945 0.0" rpy="0 1.3 0" />
+        <origin xyz="0.0 0.110945 0.0" rpy="0 1.0 0" />
         <axis xyz="0 1 0" />
         <parent link="rear_left_hip" />
         <child link="rear_left_upper_leg" />
@@ -465,7 +465,7 @@
         </collision>
     </link>
     <joint name="rear_left_knee" type="revolute">
-        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.6 0" />
+        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.0 0" />
         <axis xyz="0 1 0" />
         <parent link="rear_left_upper_leg" />
         <child link="rear_left_lower_leg" />
@@ -503,7 +503,7 @@
         </collision>
     </link>
     <joint name="rear_right_hip_y" type="revolute">
-        <origin xyz="0.0 -0.110945 0.0" rpy="0 1.3 0" />
+        <origin xyz="0.0 -0.110945 0.0" rpy="0 1.0 0" />
         <axis xyz="0 1 0" />
         <parent link="rear_right_hip" />
         <child link="rear_right_upper_leg" />
@@ -522,7 +522,7 @@
         </collision>
     </link>
     <joint name="rear_right_knee" type="revolute">
-        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.6 0" />
+        <origin xyz="0.025 0.000 -0.3205" rpy="0 -2.0 0" />
         <axis xyz="0 1 0" />
         <parent link="rear_right_upper_leg" />
         <child link="rear_right_lower_leg" />
