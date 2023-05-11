@@ -151,6 +151,15 @@ export class DragControl extends Module {
     }
   }
 
+  unload() {
+    this.controller.removeButtonAction("grip", "drag-control");
+    this.controller.removeButtonAction("gripstart", "drag-control");
+    this.controller.removeButtonAction("gripend", "drag-control");
+    this.controller.removeButtonAction("trigger", "drag-control");
+    this.controller.removeButtonAction("triggerstart", "drag-control");
+    this.controller.removeButtonAction("triggerend", "drag-control");
+  }
+
   reset() {
     if (this.fsm.is("DRAG_CONTROL")) this.fsm.deactivateDragControl();
   }

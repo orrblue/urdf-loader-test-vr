@@ -99,7 +99,7 @@ export default class Control {
           utilities
         ),
         {
-          robot: "ur5",
+          robot: "sawyer",
           text: "Erasing.\n\n",
         }
       ),

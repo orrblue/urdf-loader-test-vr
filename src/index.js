@@ -10,7 +10,11 @@ import ThreeMeshUI from "three-mesh-ui";
 import Control from "./components/Control.js";
 import { Data } from "./components/Data";
 import { UI } from "./components/UI";
-import { recurseMaterialTraverse } from "./utilities/robot";
+import {
+  recurseMaterialTraverse,
+  getCurrEEPose,
+  updateRobot,
+} from "./utilities/robot";
 import RAPIER from "@dimforge/rapier3d";
 
 /**
@@ -309,6 +313,32 @@ window.setRobot = (name) => {
   window.robotObjs.forEach((visualGroup, rigidBody) =>
     window.simObjs.set(rigidBody, visualGroup)
   );
+};
+
+window.setMobileIK = (active) => {
+  return;
+  let result = window.ikResult;
+  let eePose = getCurrEEPose();
+  if (active && window.robotName == "spotArm") {
+    window.setRobot("mobileSpotArm");
+    result.splice(0, 0, 0, 0, 0);
+  } else if (!active && window.robotName == "mobileSpotArm") {
+    window.setRobot("spotArm");
+    const pose = result.splice(0, 3);
+    window.robotGroup.translateX(pose[0]);
+    window.robotGroup.translateZ(-pose[1]);
+    window.robotGroup.rotateY(pose[2]);
+  } else {
+    return;
+  }
+  window.relaxedIK.reset(result);
+  eePose.posi.sub(window.initEEAbsThree.getWorldPosition(new T.Vector3()));
+  eePose.posi.applyQuaternion(window.robotGroup.quaternion);
+  window.goalEERelThree.position.copy(eePose.posi);
+  window.goalEERelThree.quaternion.copy(
+    eePose.ori.premultiply(window.robotGroup.quaternion)
+  );
+  updateRobot();
 };
 
 ///////////////////////////////////////////////////////////

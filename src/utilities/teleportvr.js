@@ -118,8 +118,10 @@ export default class TeleportVR {
       );
       this._group.rotation.y = Math.atan2(-direction.z, direction.x);
       window.firstPerson = true;
+      window.setMobileIK(false);
     } else {
       window.firstPerson = false;
+      window.setMobileIK(true);
       const yPos = this._group.position.y;
       this.setCamPos(newPos);
       this._group.position.y = yPos;

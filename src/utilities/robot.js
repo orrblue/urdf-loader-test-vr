@@ -80,7 +80,7 @@ export function updateRobot() {
   const deltaOri = currEEAbsThree.ori.angleTo(goalEERelRos.ori); // angle difference
 
   if (deltaPosi > 1e-3 || deltaOri > 1e-3) {
-    const result = window.relaxedIK.solve(
+    window.ikResult = window.relaxedIK.solve(
       [goalEERelRos.posi.x, goalEERelRos.posi.y, goalEERelRos.posi.z],
       [
         goalEERelRos.ori.w,
@@ -97,7 +97,7 @@ export function updateRobot() {
     joints.forEach((joint) => {
       const jointIndex = window.robotConfigs.joint_ordering.indexOf(joint[0]);
       if (jointIndex != -1)
-        window.robot.setJointValue(joint[0], result[jointIndex]);
+        window.robot.setJointValue(joint[0], window.ikResult[jointIndex]);
     });
 
     window.linkToRigidBody.forEach((rigidBody, link) => {
@@ -114,7 +114,9 @@ export function updateRobot() {
 }
 
 export function resetRobot() {
+  window.grasped = false;
   window.firstPerson = false;
+  window.setMobileIK(true);
   window.teleportvr.set(new T.Vector3(0.25, 0, 0.5));
   window.teleportvr._group.rotation.y = 0;
   window.robotGroup.position.x = 0;
@@ -124,6 +126,5 @@ export function resetRobot() {
   window.goalEERelThree.quaternion.copy(new T.Quaternion().identity());
   window.relaxedIK.reset([]);
   updateRobot();
-  const pose = getCurrEEPose();
-  window.initEEAbsThree.position.copy(pose.posi);
+  window.initEEAbsThree.position.copy(getCurrEEPose().posi);
 }

@@ -107,6 +107,15 @@ export class RemoteControl extends Module {
     }
   }
 
+  unload() {
+    this.controller.removeButtonAction("grip", "remote-control");
+    this.controller.removeButtonAction("gripstart", "remote-control");
+    this.controller.removeButtonAction("gripend", "remote-control");
+    this.controller.removeButtonAction("trigger", "remote-control");
+    this.controller.removeButtonAction("triggerstart", "remote-control");
+    this.controller.removeButtonAction("triggerend", "remote-control");
+  }
+
   reset() {
     if (this.fsm.is("REMOTE_CONTROL")) this.fsm.deactivateRemoteControl();
   }

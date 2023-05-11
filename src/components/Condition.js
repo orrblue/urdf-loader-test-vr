@@ -6,10 +6,14 @@ export default class Condition {
   constructor(name, module, utilities, grip = false) {
     this.name = name;
     this.module = module;
-    this.grip = grip;
-    this.graspingControl = new Grasping(utilities, {
-      controlMode: "trigger-toggle",
-    });
+    this.fp = !window.firstPerson;
+    if (grip) {
+      this.graspingControl = new Grasping(utilities, {
+        controlMode: "trigger-toggle",
+      });
+    } else {
+      this.graspingControl = null;
+    }
     this.fpControl = new DragControl(utilities, { controlMode: "grip-toggle" });
 
     this.isLoaded = false;
@@ -22,14 +26,18 @@ export default class Condition {
       methods: {},
     };
 
-    this.module.load(config);
-    this.graspingControl.load(config);
     this.fpControl.load(config);
+    if (this.graspingControl) {
+      this.graspingControl.load(config);
+    }
+    this.module.load(config);
 
     this.fsm = new StateMachine(config);
 
     this.module.setFSM(this.fsm);
-    this.graspingControl.setFSM(this.fsm);
+    if (this.graspingControl) {
+      this.graspingControl.setFSM(this.fsm);
+    }
     this.fpControl.setFSM(this.fsm);
 
     this.isLoaded = true;
@@ -37,9 +45,14 @@ export default class Condition {
 
   unload() {
     this.reset();
-    this.module.unload();
-    this.graspingControl.unload();
-    this.fpControl.unload();
+    if (this.fp) {
+      this.fpControl.unload();
+    } else {
+      this.module.unload();
+    }
+    if (this.graspingControl) {
+      this.graspingControl.unload();
+    }
     this.fsm = undefined;
 
     this.isLoaded = false;
@@ -47,18 +60,36 @@ export default class Condition {
 
   reset() {
     this.module.reset();
-    this.graspingControl.reset();
+    if (this.graspingControl) {
+      this.graspingControl.reset();
+    }
     this.fpControl.reset();
   }
 
   update(t, info) {
+    const config = {
+      init: "IDLE",
+      transitions: [],
+      methods: {},
+    };
+
     if (window.firstPerson) {
+      if (!this.fp) {
+        this.module.unload();
+        this.fpControl.load(config);
+      }
       this.fpControl.update(t, info);
     } else {
+      if (this.fp) {
+        this.fpControl.unload();
+        this.module.load(config);
+      }
       this.module.update(t, info);
     }
 
-    if (this.grip) {
+    this.fp = window.firstPerson;
+
+    if (this.graspingControl) {
       this.graspingControl.update(t, info);
     }
   }
