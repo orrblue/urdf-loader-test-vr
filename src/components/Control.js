@@ -88,7 +88,7 @@ export default class Control {
         ),
         {
           trace: "ros",
-          text: "Drawing.\n\n",
+          text: "Drawing Task.\n\n",
         }
       ),
       await Erasing.init(
@@ -100,7 +100,7 @@ export default class Control {
         ),
         {
           robot: "sawyer",
-          text: "Erasing.\n\n",
+          text: "Erasing Task.\n\n",
         }
       ),
       await GraspingTutorial.init(
@@ -128,10 +128,35 @@ export default class Control {
           text: "Pouring Task.\n\n",
         }
       ),
-      await End.init(
+      await Drawing.init(
         utilities,
         new Condition(
           "remote-control-only",
+          new RemoteControl(utilities, { controlMode: "grip-toggle" }),
+          utilities
+        ),
+        {
+          robot: "mobileSpotArm",
+          trace: "ros",
+          text: "Mobile Spot Arm Demo.\n\n",
+        }
+      ),
+      await Erasing.init(
+        utilities,
+        new Condition(
+          "redirected-control-only",
+          new RedirectedControl(utilities, { controlMode: "grip-toggle" }),
+          utilities
+        ),
+        {
+          robot: "sawyer",
+          text: "Redirected Control Demo.\n\n",
+        }
+      ),
+      await End.init(
+        utilities,
+        new Condition(
+          "redirected-control-only",
           new RemoteControl(utilities, { controlMode: "grip-toggle" }),
           utilities
         )

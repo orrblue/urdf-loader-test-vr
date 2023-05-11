@@ -318,7 +318,6 @@ window.setRobot = (name) => {
 window.setMobileIK = (active) => {
   return;
   let result = window.ikResult;
-  let eePose = getCurrEEPose();
   if (active && window.robotName == "spotArm") {
     window.setRobot("mobileSpotArm");
     result.splice(0, 0, 0, 0, 0);
@@ -332,13 +331,10 @@ window.setMobileIK = (active) => {
     return;
   }
   window.relaxedIK.reset(result);
-  eePose.posi.sub(window.initEEAbsThree.getWorldPosition(new T.Vector3()));
-  eePose.posi.applyQuaternion(window.robotGroup.quaternion);
-  window.goalEERelThree.position.copy(eePose.posi);
-  window.goalEERelThree.quaternion.copy(
-    eePose.ori.premultiply(window.robotGroup.quaternion)
-  );
+  window.goalEERelThree.position.copy(new T.Vector3());
+  window.goalEERelThree.quaternion.copy(new T.Quaternion().identity());
   updateRobot();
+  window.initEEAbsThree.position.copy(getCurrEEPose().posi);
 };
 
 ///////////////////////////////////////////////////////////

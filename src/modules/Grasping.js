@@ -40,7 +40,7 @@ export default class Grasping extends Module {
           "right_gripper_r_finger_tip"
         ].getWorldPosition(new T.Vector3());
         scaler = 1;
-      } else {
+      } else if (window.robotName == "ur5") {
         pos1 = window.robot.links["left_inner_finger_pad"].getWorldPosition(
           new T.Vector3()
         );
@@ -48,6 +48,8 @@ export default class Grasping extends Module {
           new T.Vector3()
         );
         scaler = -1;
+      } else {
+        return;
       }
       if (pos1.distanceTo(pos2) <= 0.08) {
         const leftPosition = window.leftFinger.link
@@ -78,7 +80,7 @@ export default class Grasping extends Module {
           "right_gripper_r_finger_tip"
         ].getWorldPosition(new T.Vector3());
         scaler = 1;
-      } else {
+      } else if (window.robotName == "ur5") {
         pos1 = window.robot.links["left_inner_finger_pad"].getWorldPosition(
           new T.Vector3()
         );
@@ -86,6 +88,8 @@ export default class Grasping extends Module {
           new T.Vector3()
         );
         scaler = -1;
+      } else {
+        return;
       }
       if (pos1.distanceTo(pos2) >= 0.01 && !window.grasped) {
         const leftPosition = window.leftFinger.link
