@@ -334,7 +334,10 @@ window.setMobileIK = (active) => {
   window.goalEERelThree.position.copy(new T.Vector3());
   window.goalEERelThree.quaternion.copy(new T.Quaternion().identity());
   updateRobot();
-  window.initEEAbsThree.position.copy(getCurrEEPose().posi);
+  const eePosi = getCurrEEPose().posi;
+  eePosi.applyQuaternion(window.robotGroup.quaternion);
+  eePosi.sub(window.robotGroup.position);
+  window.initEEAbsThree.position.copy(eePosi);
 };
 
 ///////////////////////////////////////////////////////////

@@ -48,67 +48,102 @@ export class ClutchedOffsetControl extends Module {
         `Control mode \"${mode}\" does not exist for Remote Control`
       );
 
-    this.controller.removeButtonAction("grip", "remote-control");
-    this.controller.removeButtonAction("gripstart", "remote-control");
-    this.controller.removeButtonAction("gripend", "remote-control");
-    this.controller.removeButtonAction("trigger", "remote-control");
-    this.controller.removeButtonAction("triggerstart", "remote-control");
-    this.controller.removeButtonAction("triggerend", "remote-control");
+    this.controller.removeButtonAction("grip", "clutched-offset-control");
+    this.controller.removeButtonAction("gripstart", "clutched-offset-control");
+    this.controller.removeButtonAction("gripend", "clutched-offset-control");
+    this.controller.removeButtonAction("trigger", "clutched-offset-control");
+    this.controller.removeButtonAction(
+      "triggerstart",
+      "clutched-offset-control"
+    );
+    this.controller.removeButtonAction("triggerend", "clutched-offset-control");
 
     switch (mode) {
       case "grip-hold":
-        this.controller.addButtonAction("gripstart", "remote-control", () => {
-          if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
-        });
+        this.controller.addButtonAction(
+          "gripstart",
+          "clutched-offset-control",
+          () => {
+            if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
+          }
+        );
 
-        this.controller.addButtonAction("gripend", "remote-control", () => {
-          if (this.fsm.is("CLUTCHED_OFFSET_CONTROL"))
-            this.fsm.deactivateRemoteControl();
-        });
+        this.controller.addButtonAction(
+          "gripend",
+          "clutched-offset-control",
+          () => {
+            if (this.fsm.is("CLUTCHED_OFFSET_CONTROL"))
+              this.fsm.deactivateRemoteControl();
+          }
+        );
         this.modeInstructions =
           "Activate: Press and hold the grip button.\nDeactivate: Release the grip button.";
         break;
       case "grip-toggle":
-        this.controller.addButtonAction("grip", "remote-control", () => {
-          if (this.fsm.is("IDLE")) {
-            this.fsm.activateRemoteControl();
-          } else if (this.fsm.is("CLUTCHED_OFFSET_CONTROL")) {
-            this.fsm.deactivateRemoteControl();
+        this.controller.addButtonAction(
+          "grip",
+          "clutched-offset-control",
+          () => {
+            if (this.fsm.is("IDLE")) {
+              this.fsm.activateRemoteControl();
+            } else if (this.fsm.is("CLUTCHED_OFFSET_CONTROL")) {
+              this.fsm.deactivateRemoteControl();
+            }
           }
-        });
+        );
         this.modeInstructions =
           "Activate: Press the grip button.\nDeactivate: Press the grip button again.";
         break;
       case "trigger-hold":
         this.controller.addButtonAction(
           "triggerstart",
-          "remote-control",
+          "clutched-offset-control",
           () => {
             if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
           }
         );
 
-        this.controller.addButtonAction("triggerend", "remote-control", () => {
-          if (this.fsm.is("CLUTCHED_OFFSET_CONTROL"))
-            this.fsm.deactivateRemoteControl();
-        });
+        this.controller.addButtonAction(
+          "triggerend",
+          "clutched-offset-control",
+          () => {
+            if (this.fsm.is("CLUTCHED_OFFSET_CONTROL"))
+              this.fsm.deactivateRemoteControl();
+          }
+        );
         this.modeInstructions =
           "Activate: Squeeze and hold the trigger.\nDeactivate: Release the trigger.";
         break;
       case "trigger-toggle":
-        this.controller.addButtonAction("trigger", "remote-control", () => {
-          if (this.fsm.is("IDLE")) {
-            this.fsm.activateRemoteControl();
-          } else if (this.fsm.is("CLUTCHED_OFFSET_CONTROL")) {
-            this.fsm.deactivateRemoteControl();
+        this.controller.addButtonAction(
+          "trigger",
+          "clutched-offset-control",
+          () => {
+            if (this.fsm.is("IDLE")) {
+              this.fsm.activateRemoteControl();
+            } else if (this.fsm.is("CLUTCHED_OFFSET_CONTROL")) {
+              this.fsm.deactivateRemoteControl();
+            }
           }
-        });
+        );
         this.modeInstructions =
           "Activate: Squeeze the trigger.\nDeactivate: Squeeze the trigger again.";
         break;
       default:
         break;
     }
+  }
+
+  unload() {
+    this.controller.removeButtonAction("grip", "clutched-offset-control");
+    this.controller.removeButtonAction("gripstart", "clutched-offset-control");
+    this.controller.removeButtonAction("gripend", "clutched-offset-control");
+    this.controller.removeButtonAction("trigger", "clutched-offset-control");
+    this.controller.removeButtonAction(
+      "triggerstart",
+      "clutched-offset-control"
+    );
+    this.controller.removeButtonAction("triggerend", "clutched-offset-control");
   }
 
   reset() {

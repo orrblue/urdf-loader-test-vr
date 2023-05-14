@@ -47,20 +47,24 @@ export class RedirectedControl extends Module {
         `Control mode \"${mode}\" does not exist for Remote Control`
       );
 
-    this.controller.removeButtonAction("grip", "remote-control");
-    this.controller.removeButtonAction("gripstart", "remote-control");
-    this.controller.removeButtonAction("gripend", "remote-control");
-    this.controller.removeButtonAction("trigger", "remote-control");
-    this.controller.removeButtonAction("triggerstart", "remote-control");
-    this.controller.removeButtonAction("triggerend", "remote-control");
+    this.controller.removeButtonAction("grip", "redirected-control");
+    this.controller.removeButtonAction("gripstart", "redirected-control");
+    this.controller.removeButtonAction("gripend", "redirected-control");
+    this.controller.removeButtonAction("trigger", "redirected-control");
+    this.controller.removeButtonAction("triggerstart", "redirected-control");
+    this.controller.removeButtonAction("triggerend", "redirected-control");
 
     switch (mode) {
       case "grip-hold":
-        this.controller.addButtonAction("gripstart", "remote-control", () => {
-          if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
-        });
+        this.controller.addButtonAction(
+          "gripstart",
+          "redirected-control",
+          () => {
+            if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
+          }
+        );
 
-        this.controller.addButtonAction("gripend", "remote-control", () => {
+        this.controller.addButtonAction("gripend", "redirected-control", () => {
           if (this.fsm.is("REDIRECTED_CONTROL"))
             this.fsm.deactivateRemoteControl();
         });
@@ -68,7 +72,7 @@ export class RedirectedControl extends Module {
           "Activate: Press and hold the grip button.\nDeactivate: Release the grip button.";
         break;
       case "grip-toggle":
-        this.controller.addButtonAction("grip", "remote-control", () => {
+        this.controller.addButtonAction("grip", "redirected-control", () => {
           if (this.fsm.is("IDLE")) {
             this.fsm.activateRemoteControl();
           } else if (this.fsm.is("REDIRECTED_CONTROL")) {
@@ -81,21 +85,25 @@ export class RedirectedControl extends Module {
       case "trigger-hold":
         this.controller.addButtonAction(
           "triggerstart",
-          "remote-control",
+          "redirected-control",
           () => {
             if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
           }
         );
 
-        this.controller.addButtonAction("triggerend", "remote-control", () => {
-          if (this.fsm.is("REDIRECTED_CONTROL"))
-            this.fsm.deactivateRemoteControl();
-        });
+        this.controller.addButtonAction(
+          "triggerend",
+          "redirected-control",
+          () => {
+            if (this.fsm.is("REDIRECTED_CONTROL"))
+              this.fsm.deactivateRemoteControl();
+          }
+        );
         this.modeInstructions =
           "Activate: Squeeze and hold the trigger.\nDeactivate: Release the trigger.";
         break;
       case "trigger-toggle":
-        this.controller.addButtonAction("trigger", "remote-control", () => {
+        this.controller.addButtonAction("trigger", "redirected-control", () => {
           if (this.fsm.is("IDLE")) {
             this.fsm.activateRemoteControl();
           } else if (this.fsm.is("REDIRECTED_CONTROL")) {
@@ -108,6 +116,15 @@ export class RedirectedControl extends Module {
       default:
         break;
     }
+  }
+
+  unload() {
+    this.controller.removeButtonAction("grip", "redirected-control");
+    this.controller.removeButtonAction("gripstart", "redirected-control");
+    this.controller.removeButtonAction("gripend", "redirected-control");
+    this.controller.removeButtonAction("trigger", "redirected-control");
+    this.controller.removeButtonAction("triggerstart", "redirected-control");
+    this.controller.removeButtonAction("triggerend", "redirected-control");
   }
 
   reset() {

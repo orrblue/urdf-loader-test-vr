@@ -47,27 +47,27 @@ export class OffsetControl extends Module {
         `Control mode \"${mode}\" does not exist for Remote Control`
       );
 
-    this.controller.removeButtonAction("grip", "remote-control");
-    this.controller.removeButtonAction("gripstart", "remote-control");
-    this.controller.removeButtonAction("gripend", "remote-control");
-    this.controller.removeButtonAction("trigger", "remote-control");
-    this.controller.removeButtonAction("triggerstart", "remote-control");
-    this.controller.removeButtonAction("triggerend", "remote-control");
+    this.controller.removeButtonAction("grip", "offset-control");
+    this.controller.removeButtonAction("gripstart", "offset-control");
+    this.controller.removeButtonAction("gripend", "offset-control");
+    this.controller.removeButtonAction("trigger", "offset-control");
+    this.controller.removeButtonAction("triggerstart", "offset-control");
+    this.controller.removeButtonAction("triggerend", "offset-control");
 
     switch (mode) {
       case "grip-hold":
-        this.controller.addButtonAction("gripstart", "remote-control", () => {
+        this.controller.addButtonAction("gripstart", "offset-control", () => {
           if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
         });
 
-        this.controller.addButtonAction("gripend", "remote-control", () => {
+        this.controller.addButtonAction("gripend", "offset-control", () => {
           if (this.fsm.is("OFFSET_CONTROL")) this.fsm.deactivateRemoteControl();
         });
         this.modeInstructions =
           "Activate: Press and hold the grip button.\nDeactivate: Release the grip button.";
         break;
       case "grip-toggle":
-        this.controller.addButtonAction("grip", "remote-control", () => {
+        this.controller.addButtonAction("grip", "offset-control", () => {
           if (this.fsm.is("IDLE")) {
             this.fsm.activateRemoteControl();
           } else if (this.fsm.is("OFFSET_CONTROL")) {
@@ -80,20 +80,20 @@ export class OffsetControl extends Module {
       case "trigger-hold":
         this.controller.addButtonAction(
           "triggerstart",
-          "remote-control",
+          "offset-control",
           () => {
             if (this.fsm.is("IDLE")) this.fsm.activateRemoteControl();
           }
         );
 
-        this.controller.addButtonAction("triggerend", "remote-control", () => {
+        this.controller.addButtonAction("triggerend", "offset-control", () => {
           if (this.fsm.is("OFFSET_CONTROL")) this.fsm.deactivateRemoteControl();
         });
         this.modeInstructions =
           "Activate: Squeeze and hold the trigger.\nDeactivate: Release the trigger.";
         break;
       case "trigger-toggle":
-        this.controller.addButtonAction("trigger", "remote-control", () => {
+        this.controller.addButtonAction("trigger", "offset-control", () => {
           if (this.fsm.is("IDLE")) {
             this.fsm.activateRemoteControl();
           } else if (this.fsm.is("OFFSET_CONTROL")) {
@@ -106,6 +106,15 @@ export class OffsetControl extends Module {
       default:
         break;
     }
+  }
+
+  unload() {
+    this.controller.removeButtonAction("grip", "offset-control");
+    this.controller.removeButtonAction("gripstart", "offset-control");
+    this.controller.removeButtonAction("gripend", "offset-control");
+    this.controller.removeButtonAction("trigger", "offset-control");
+    this.controller.removeButtonAction("triggerstart", "offset-control");
+    this.controller.removeButtonAction("triggerend", "offset-control");
   }
 
   reset() {
