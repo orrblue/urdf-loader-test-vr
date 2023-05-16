@@ -31,7 +31,6 @@ function loadRobot(
   config_link,
   urdf_link,
   loadScreen = false,
-  init = false,
   defaultPosi = new T.Vector3(0.2, 0.05, 0),
   fpCamOffset = new T.Vector3(-0.15, 1.5, 0)
 ) {
@@ -279,7 +278,7 @@ function loadRobot(
         initRobotPhysics(joint);
       });
 
-      if (init) {
+      if (name == window.robotName) {
         someInit(name);
       }
     });
@@ -316,7 +315,7 @@ window.setRobot = (name) => {
 };
 
 window.setMobileIK = (active) => {
-  return;
+  /*
   let result = window.ikResult;
   if (active && window.robotName == "spotArm") {
     window.setRobot("mobileSpotArm");
@@ -338,6 +337,7 @@ window.setMobileIK = (active) => {
   eePosi.applyQuaternion(window.robotGroup.quaternion);
   eePosi.sub(window.robotGroup.position);
   window.initEEAbsThree.position.copy(eePosi);
+  */
 };
 
 ///////////////////////////////////////////////////////////
@@ -416,6 +416,9 @@ const robots = {
   },
 };
 
+// Set the starting robot
+window.robotName = "spotArm";
+
 getURDFFromURL(robots.sawyer.urdf, (blob) => {
   robots.sawyer.file = URL.createObjectURL(blob);
   loadRobot(
@@ -424,7 +427,6 @@ getURDFFromURL(robots.sawyer.urdf, (blob) => {
     robots.sawyer.config,
     robots.sawyer.urdf,
     true,
-    false,
     new T.Vector3(0.2, 0.05, 0),
     new T.Vector3(0.15, 1.5, 0)
   );
@@ -438,7 +440,6 @@ getURDFFromURL(robots.ur5.urdf, (blob) => {
     robots.ur5.config,
     robots.ur5.urdf,
     true,
-    false,
     new T.Vector3(0.2, 0.75, 0),
     new T.Vector3(0.2, 1.5, 0)
   );
@@ -451,7 +452,6 @@ getURDFFromURL(robots.spotArm.urdf, (blob) => {
     robots.spotArm.file,
     robots.spotArm.config,
     robots.spotArm.urdf,
-    true,
     true,
     new T.Vector3(0.2, 0.5, 0),
     new T.Vector3(0.5, 1.2, 0)
@@ -466,7 +466,6 @@ getURDFFromURL(robots.mobileSpotArm.urdf, (blob) => {
     robots.mobileSpotArm.config,
     robots.mobileSpotArm.urdf,
     true,
-    false,
     new T.Vector3(0.2, 0.5, 0),
     new T.Vector3(0.5, 1.2, 0)
   );

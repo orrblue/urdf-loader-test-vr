@@ -9,11 +9,11 @@ import * as THREE from "three";
 export default class TeleportVR {
   constructor(scene, camera) {
     this.controlScheme = "hold";
-    this.settingTeleport = false;
-    this.settingFPCameraLock = false;
     this.rotationScheme = "ee";
     this.fpClipDist = 1;
     this.enabled = false;
+    this.settingTeleport = false;
+    this.settingFPCameraLock = false;
     this._group = new THREE.Group();
     this._target = new THREE.Group();
     this._curve = new THREE.Mesh();
@@ -225,7 +225,7 @@ export default class TeleportVR {
           this._target.lookAt(goal);
           this._target.rotateY(Math.PI);
         } else if (
-          this.rotationScheme == "default" &&
+          this.rotationScheme == "joystick" &&
           Math.abs(gp.axes[2]) + Math.abs(gp.axes[3]) > 0.25
         ) {
           this._target.rotation.y = Math.atan2(-gp.axes[2], -gp.axes[3]); //angle degrees

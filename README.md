@@ -11,7 +11,7 @@ git submodule init
 git submodule update
 ```
 
-Then, follow the instructions [here](https://github.com/uwgraphics/relaxed_ik_core/tree/ranged-ik#javascript-webassembly-wrapper) to install dependencies (e.g. Rust) of the relaxed_ik submodule. 
+Then, follow the instructions [here](https://github.com/uwgraphics/relaxed_ik_core/tree/ranged-ik#javascript-webassembly-wrapper) to install dependencies (e.g. Rust) of the relaxed_ik submodule.
 
 Then, if you need to instal Node.js: install the latest LTS version of Node.js (18.16.0 at time of writing) using [nvm](https://github.com/nvm-sh/nvm) (recommended) or the [Node.js installer](https://nodejs.org/en/download)
 
@@ -25,11 +25,30 @@ npm run build
 
 Note that `npm run build` must be executed everytime changes are made to the code.
 
-For development, Android Debug Bridge (adb) must be installed. 
+For development, Android Debug Bridge (adb) must be installed.
 
 Then, follow the instructions below linked [here](https://github.com/kjoseph8/urdf-loader-test-vr#debugging-from-the-quest)
 
 ## New Additions
+
+### Control Scheme:
+
+#### In the url, append "?hand=left" to change to left handed mode. Defaults to right handed mode.
+
+Grip (depends on hand): start/stop controlling the robot (clutch)
+Trigger (depends on hand): close robot gripper
+
+left joystick: translate the robot
+right joystick: rotate the robot
+
+a: teleport
+b: adjust first person control between robot->camera and camera->robot
+
+- robot->camera: translate and rotate the robot to line up with the camera
+- camera->robot: translate the camera to line up with the robot. translate and rotate the robot using the joysticks.
+
+- x: restart the current task
+- y: continue to the next task
 
 ### Drawing Task
 
@@ -41,8 +60,6 @@ debug (bool): Indicate to backend that data is for debugging instead of real exp
 
 robotControlled (bool): Choose to draw by either holding the marker at the controller poisition or by having the robot hold the marker.
 
-setRobot (str): Name of the robot to set at start of task. If not specified, uses current robot.
-
 adjustedControl (bool): Rotate marker to hold controller differently when controller controlled, or move center of rotation when robot controlled
 
 distFromWhiteboard (float): Distance away from whiteboard for the marker to start drawing
@@ -51,7 +68,7 @@ drawVibrationStrength (float): Specifies how much controller vibrates when drawi
 
 rotationBased (bool): Choose whether the drawing functionality will involve a projection perpendicular to the whiteboard (false) or parallel to the marker (true).
 
-stopOnCollision (bool): Add fake collision behavior between the marker and the whiteboard.
+stopOnCollision (bool): Add fake collision behavior between the marker and the whiteboard (needs to be fixed for robot using window.adjustedControl).
 
 pointerSize (float): Size of projection pointer. If not specified, there will be no projection pointer.
 
@@ -77,13 +94,11 @@ debug (bool): Indicate to backend that data is for debugging instead of real exp
 
 robotControlled (bool): Choose to draw by either holding the marker at the controller poisition or by having the robot hold the marker.
 
-setRobot (str): Name of the robot to set at start of task. If not specified, uses current robot.
-
 distFromWhiteboard (float): Distance away from whiteboard for all corners of eraser to start erasing
 
 eraseVibrationStrength (float): Specifies how much controller vibrates when erasing. default: 0 or no vibration
 
-stopOnCollision (bool): Add fake collision behavior between the eraser and the whiteboard.
+stopOnCollision (bool): Add fake collision behavior between the eraser and the whiteboard (needs to be fixed for robot using window.adjustedControl).
 
 color (str): Color of pre-existing lines.
 
@@ -100,6 +115,43 @@ Change the current robot.
 robotName = "sawyer" -> set the robot to sawyer
 
 robotName = "ur5" -> set the robot to ur5
+
+robotName = "spotArm" -> set the spot robot with stationary IK
+
+robotName = "mobileSpotArm" -> set the spot robot with mobile IK
+
+#### You can also change the robot between tasks by setting "robot" in a Task's options to the robotName
+
+## window.adjustedControl(goal)
+
+Adjust the end-effector goal before it's passed into the IK solver (useful for adjusting the center of rotation or faking collisions)
+
+- goal (Object3D): 3d mesh representing the end effector goal
+
+- return {posi: Vector3, ori: Quaternion}
+
+### Added Parameters to getURDFFromURL in index.js:
+
+defaultPosi (Vector3): default position of the robot (the y position is extra important)
+
+fpCamOffset (Vector3): offset of the camera from the robot in first person mode (the y position is the offset from the ground)
+
+#### Before all calls to getURDFFromURL, make sure to set window.robotName to the name of the starting robot
+
+### Added Fields to teleportvr:
+
+controlScheme (string): how pressing the "a" button control the teleportation
+
+- "hold": hold "a" to show the teleport indicator and release to teleport (recommended)
+- "": touch the joystick to show the teleport indicator and press it to teleport
+
+rotationScheme (string): how to control the player's rotation when teleporting
+
+- "ee": teleport to face the end effector (recommended)
+- "joystick": control the direction of teleportation with the joystick
+- "": don't rotate during teleportation
+
+fpClipDist (float): how close the teleport indicator needs to be to the robot to switch to first person mode
 
 ## Design
 
