@@ -36,18 +36,23 @@ Then, follow the instructions below linked [here](https://github.com/kjoseph8/ur
 #### In the url, append "?hand=left" to change to left handed mode. Defaults to right handed mode.
 
 Grip (depends on hand): start/stop controlling the robot (clutch)
+
 Trigger (depends on hand): close robot gripper
 
 left joystick: translate the robot
+
 right joystick: rotate the robot
 
 a: teleport
+
 b: adjust first person control between robot->camera and camera->robot
 
 - robot->camera: translate and rotate the robot to line up with the camera
+
 - camera->robot: translate the camera to line up with the robot. translate and rotate the robot using the joysticks.
 
 - x: restart the current task
+
 - y: continue to the next task
 
 ### Drawing Task
@@ -122,7 +127,7 @@ robotName = "mobileSpotArm" -> set the spot robot with mobile IK
 
 #### You can also change the robot between tasks by setting "robot" in a Task's options to the robotName
 
-## window.adjustedControl(goal)
+### window.adjustedControl(goal)
 
 Adjust the end-effector goal before it's passed into the IK solver (useful for adjusting the center of rotation or faking collisions)
 
@@ -143,12 +148,15 @@ fpCamOffset (Vector3): offset of the camera from the robot in first person mode 
 controlScheme (string): how pressing the "a" button control the teleportation
 
 - "hold": hold "a" to show the teleport indicator and release to teleport (recommended)
+
 - "": touch the joystick to show the teleport indicator and press it to teleport
 
 rotationScheme (string): how to control the player's rotation when teleporting
 
 - "ee": teleport to face the end effector (recommended)
+
 - "joystick": control the direction of teleportation with the joystick
+
 - "": don't rotate during teleportation
 
 fpClipDist (float): how close the teleport indicator needs to be to the robot to switch to first person mode
