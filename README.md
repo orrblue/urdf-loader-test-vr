@@ -51,9 +51,9 @@ b: adjust first person control between robot->camera and camera->robot
 
 - camera->robot: translate the camera to line up with the robot. translate and rotate the robot using the joysticks.
 
-- x: restart the current task
+x: restart the current task
 
-- y: continue to the next task
+y: continue to the next task
 
 ### Drawing Task
 
