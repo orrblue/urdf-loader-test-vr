@@ -222,6 +222,13 @@ export default class Control {
   update(t) {
     let left_gp = this.controller.get("left").gamepad;
     let right_gp = this.controller.get("right").gamepad;
+    
+    // check if controllers are connected (rather than hand detection controllers)
+    if ( !left_gp || !right_gp || left_gp.buttons.length < 2 || right_gp.buttons.length < 2) {
+      //console.log("please reconnect controllers rather than using hand recognition");
+      return;
+    }
+
     if (window.firstPerson && !window.fpLockedCamera) {
       window.robotGroup.position.x = window.camera.position.x;
       const direction = new T.Vector3(0, 0, 1).applyQuaternion(
