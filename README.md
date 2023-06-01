@@ -2,7 +2,12 @@
 
 A web-based application for running robot experiments in VR. The application is hosted [here](https://wycongwisc.github.io/urdf-loader-test-vr/).
 
-## Installation
+## Setup
+
+### Prerequisite 
+* Node.js: install the latest LTS version of Node.js (18.16.0 at time of writing) using [nvm](https://github.com/nvm-sh/nvm) (recommended) or the [Node.js installer](https://nodejs.org/en/download)
+
+### Installation
 
 First, clone the repository and pull the submodules with
 
@@ -11,25 +16,56 @@ git submodule init
 git submodule update
 ```
 
-Then, follow the instructions [here](https://github.com/uwgraphics/relaxed_ik_core/tree/ranged-ik#javascript-webassembly-wrapper) to install dependencies (e.g. Rust) of the relaxed_ik submodule.
+Then, `cd relaxed_ik_core` and follow that submodule's JavaScript WebAssembly Wrapper instructions [here](https://github.com/uwgraphics/relaxed_ik_core/tree/ranged-ik#javascript-webassembly-wrapper) to install its dependencies (e.g. Rust) and compile. 
+Return to this repo `cd ..`
 
-Then, if you need to instal Node.js: install the latest LTS version of Node.js (18.16.0 at time of writing) using [nvm](https://github.com/nvm-sh/nvm) (recommended) or the [Node.js installer](https://nodejs.org/en/download)
-
-Finally, run the following commands:
+Finally, in this repo run the following commands:
 
 ```console
 npm install
-npm update
 npm run build
 ```
 
-Note that `npm run build` must be executed everytime changes are made to the code.
+## Development
 
-For development, Android Debug Bridge (adb) must be installed.
+For development, we used Android Debug Bridge (adb) to enable headset connection to the locally-running server, and to receive debug (console) information from the headset's browser.
 
-Then, follow the instructions below linked [here](https://github.com/kjoseph8/urdf-loader-test-vr#debugging-from-the-quest)
+_Note that `npm run build` must be executed everytime changes are made to the code._
 
-## New Additions
+
+### Debugging For the Quest
+
+Prereqs:
+* Visual Studio Code (VS Code) 
+* Live Server extension for VS Code
+* Developer Mode is Enabled in Quest
+* Android Debug Bridge (adb) is installed
+* Optional, but recommended: *Meta Quest Developer Hub* 
+  * Provides helpful features like turning off Quests's proximity sensor
+
+Wired Debugging:
+1. Plug the Quest into the computer. View connected devices with `adb devices`
+2. Start the application on a live server (port 5501) with VSCode.
+3. Open the terminal and type the command `adb reverse tcp:<port> tcp:<port>` where `<port>` corresponds to the port the live server is running on. 
+4. With the live server running, go to `http://localhost:<port>` in the Quest browser. The application should appear.
+5. To use the chrome debugger, go to `chrome://inspect/#devices` in Google Chrome and click `inspect`.
+
+Wireless Debugging:
+1. Plug the Quest into the computer
+2. Ensure both VR headset and computer are on the same WiFi network
+3. `adb devices` to make sure VR headset is connected
+4. `adb shell ip addr show wlan0` and get IP address after "inet" OR do: `adb shell ip route`
+5. Restart adb with port 5555: `adb tcpip 5555`
+6. `adb connect <Headset_IP_Address>:5555`
+7. Port forwarding like above: `adb reverse tcp:<port> tcp:<port>`
+8. Disconnect cable from VR headset!
+
+_Note that `npm run build` must be executed everytime changes are made to the code._
+
+
+
+
+# New Additions
 
 ### Control Scheme:
 
@@ -247,16 +283,6 @@ These are wrapper classes that are used by the `UI` class to create the VR UI. I
 This folder contains a collection of functions and contants that are used throughout the application.
 
 ## Miscallaneous
-
-### Debugging from the Quest
-
-_NOTE: This assumes developer mode is enabled in the Quest and `adb` is installed._
-
-2. Plug the Quest into the computer.
-3. Start the application on a live server with VSCode.
-4. Open the terminal and type the command `adb reverse tcp:<port> tcp:<port>` where `<port>` corresponds to the port the live server is running on.
-5. With the live server running, go to `http://localhost:<port>` in the Quest browser. The application should appear.
-6. To use the chrome debugger, go to `chrome://inspect/#devices` in Google Chrome and click `inspect`.
 
 ### Setting up a Google Sheets Backend with Google Apps Scripts
 
