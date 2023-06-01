@@ -5,7 +5,7 @@ import * as yaml from "js-yaml";
 import { getURDFFromURL } from "./utilities/loaders";
 import initRelaxedIK, {
   RelaxedIK,
-} from "../relaxed_ik_core/pkg/relaxed_ik_core.js";
+} from "../relaxed_ik_core/pkg/relaxed_ik_lib.js";
 import ThreeMeshUI from "three-mesh-ui";
 import Control from "./components/Control.js";
 import { Data } from "./components/Data";
