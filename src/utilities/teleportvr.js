@@ -145,6 +145,10 @@ export default class TeleportVR {
   }
 
   controlStart(gp) {
+    if (gp.buttons.length < 2) {
+      console.log("please reconnect controllers rather than using hand recognition")
+      return false;
+    }
     if (gp.buttons[5].pressed) {
       this.settingFPCameraLock = true;
     }
