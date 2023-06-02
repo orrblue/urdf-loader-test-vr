@@ -284,6 +284,9 @@ This folder contains a collection of functions and contants that are used throug
 
 ## Miscallaneous
 
+### Troubleshooting
+1. If errors are encountered when pressing "Enter VR", try changing live server to host an https page. See [this YouTube video](https://www.youtube.com/watch?v=v4jgr0ppw8Q&t=337s) for instructions.
+
 ### Setting up a Google Sheets Backend with Google Apps Scripts
 
 #### Creating the Google Apps Script
